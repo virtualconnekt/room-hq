@@ -119,6 +119,12 @@ module aptosroom::errors {
     
     /// Reveal deadline passed
     public fun E_REVEAL_DEADLINE_PASSED(): u64 { 608 }
+    
+    /// Jury not selected for room
+    public fun E_JURY_NOT_SELECTED(): u64 { 609 }
+    
+    /// Commit phase not complete
+    public fun E_COMMIT_PHASE_NOT_COMPLETE(): u64 { 610 }
 
     // ============================================================
     // SETTLEMENT ERRORS (700-799)
