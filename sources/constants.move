@@ -68,14 +68,20 @@ module aptosroom::constants {
     public fun WEIGHT_DENOMINATOR(): u64 { 100 }
 
     // ============================================================
-    // TIMING PARAMETERS (in blocks or seconds - TBD)
+    // TIMING PARAMETERS (in seconds)
     // ============================================================
-    
-    // TODO: Define default deadline durations
-    // - SUBMIT_WINDOW_BLOCKS
-    // - COMMIT_WINDOW_BLOCKS
-    // - REVEAL_WINDOW_BLOCKS
 
+    /// Submission window duration: 7 days
+    public fun SUBMIT_WINDOW_SECONDS(): u64 { 604800 }
+    
+    /// Jury commit window duration: 3 days
+    public fun COMMIT_WINDOW_SECONDS(): u64 { 259200 }
+    
+    /// Jury reveal window duration: 2 days
+    public fun REVEAL_WINDOW_SECONDS(): u64 { 172800 }
+    
+    /// Client approval window duration: 3 days
+    public fun APPROVAL_WINDOW_SECONDS(): u64 { 259200 }
     // ============================================================
     // TESTS
     // ============================================================

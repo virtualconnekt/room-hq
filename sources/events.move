@@ -194,14 +194,173 @@ module aptosroom::events {
     // EVENT EMISSION HELPERS
     // ============================================================
 
-    // TODO: Implement emit_keycard_minted(owner, keycard_id, timestamp)
-    // TODO: Implement emit_room_created(room_id, client, category, task_reward, timestamp)
-    // TODO: Implement emit_room_state_changed(room_id, from_state, to_state, timestamp)
-    // TODO: Implement emit_submission_created(room_id, contributor, hash, timestamp)
-    // TODO: Implement emit_jury_assigned(room_id, jurors, timestamp)
-    // TODO: Implement emit_vote_committed(room_id, juror, hash, timestamp)
-    // TODO: Implement emit_vote_revealed(room_id, juror, score, timestamp)
-    // TODO: Implement emit_variance_flagged(room_id, juror, score, distance, timestamp)
-    // TODO: Implement emit_settlement_approved(room_id, client, timestamp)
-    // TODO: Implement emit_room_settled(room_id, winner, score, payout, timestamp)
+    /// Emit keycard minted event
+    public fun emit_keycard_minted(owner: address, keycard_id: u64, timestamp: u64) {
+        event::emit(KeycardMinted { owner, keycard_id, timestamp });
+    }
+
+    /// Emit room created event
+    public fun emit_room_created(
+        room_id: u64,
+        client: address,
+        category: String,
+        task_reward: u64,
+        timestamp: u64,
+    ) {
+        event::emit(RoomCreated { room_id, client, category, task_reward, timestamp });
+    }
+
+    /// Emit room state changed event
+    public fun emit_room_state_changed(
+        room_id: u64,
+        from_state: u8,
+        to_state: u8,
+        timestamp: u64,
+    ) {
+        event::emit(RoomStateChanged { room_id, from_state, to_state, timestamp });
+    }
+
+    /// Emit submission created event
+    public fun emit_submission_created(
+        room_id: u64,
+        contributor: address,
+        submission_hash: vector<u8>,
+        timestamp: u64,
+    ) {
+        event::emit(SubmissionCreated { room_id, contributor, submission_hash, timestamp });
+    }
+
+    /// Emit jury assigned event
+    public fun emit_jury_assigned(
+        room_id: u64,
+        jurors: vector<address>,
+        timestamp: u64,
+    ) {
+        event::emit(JuryAssigned { room_id, jurors, timestamp });
+    }
+
+    /// Emit vote committed event
+    public fun emit_vote_committed(
+        room_id: u64,
+        juror: address,
+        commit_hash: vector<u8>,
+        timestamp: u64,
+    ) {
+        event::emit(VoteCommitted { room_id, juror, commit_hash, timestamp });
+    }
+
+    /// Emit vote revealed event
+    public fun emit_vote_revealed(
+        room_id: u64,
+        juror: address,
+        score: u64,
+        timestamp: u64,
+    ) {
+        event::emit(VoteRevealed { room_id, juror, score, timestamp });
+    }
+
+    /// Emit variance flagged event
+    public fun emit_variance_flagged(
+        room_id: u64,
+        juror: address,
+        score: u64,
+        min_distance: u64,
+        timestamp: u64,
+    ) {
+        event::emit(VarianceFlagged { room_id, juror, score, min_distance, timestamp });
+    }
+
+    /// Emit settlement approved event
+    public fun emit_settlement_approved(
+        room_id: u64,
+        client: address,
+        timestamp: u64,
+    ) {
+        event::emit(SettlementApproved { room_id, client, timestamp });
+    }
+
+    /// Emit room settled event
+    public fun emit_room_settled(
+        room_id: u64,
+        winner: address,
+        final_score: u64,
+        payout_amount: u64,
+        timestamp: u64,
+    ) {
+        event::emit(RoomSettled { room_id, winner, final_score, payout_amount, timestamp });
+    }
+
+    /// Emit escrow deposited event
+    public fun emit_escrow_deposited(
+        room_id: u64,
+        depositor: address,
+        amount: u64,
+        timestamp: u64,
+    ) {
+        event::emit(EscrowDeposited { room_id, depositor, amount, timestamp });
+    }
+
+    /// Emit escrow released event
+    public fun emit_escrow_released(
+        room_id: u64,
+        recipient: address,
+        amount: u64,
+        timestamp: u64,
+    ) {
+        event::emit(EscrowReleased { room_id, recipient, amount, timestamp });
+    }
+
+    /// Emit keycard stats updated event
+    public fun emit_keycard_stats_updated(
+        owner: address,
+        tasks_completed: u64,
+        avg_score: u64,
+        jury_participations: u64,
+        variance_flags: u64,
+    ) {
+        event::emit(KeycardStatsUpdated {
+            owner,
+            tasks_completed,
+            avg_score,
+            jury_participations,
+            variance_flags,
+        });
+    }
+
+    /// Emit juror registered event
+    public fun emit_juror_registered(
+        juror: address,
+        category: String,
+        timestamp: u64,
+    ) {
+        event::emit(JurorRegistered { juror, category, timestamp });
+    }
+
+    /// Emit juror unregistered event
+    public fun emit_juror_unregistered(
+        juror: address,
+        category: String,
+        timestamp: u64,
+    ) {
+        event::emit(JurorUnregistered { juror, category, timestamp });
+    }
+
+    /// Emit scores finalized event
+    public fun emit_scores_finalized(
+        room_id: u64,
+        jury_score: u64,
+        timestamp: u64,
+    ) {
+        event::emit(ScoresFinalized { room_id, jury_score, timestamp });
+    }
+
+    /// Emit zero votes refunded event
+    public fun emit_room_zero_votes_refunded(
+        room_id: u64,
+        client: address,
+        refund_amount: u64,
+        timestamp: u64,
+    ) {
+        event::emit(RoomZeroVotesRefunded { room_id, client, refund_amount, timestamp });
+    }
 }
