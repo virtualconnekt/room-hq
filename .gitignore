@@ -1,0 +1,13 @@
+# Build artifacts
+build/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Aptos
+.aptos/

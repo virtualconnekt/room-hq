@@ -1,0 +1,16 @@
+[package]
+name = "aptosroom-protocol"
+version = "0.1.0"
+authors = ["AptosRoom Team"]
+
+[addresses]
+aptosroom = "0xCAFE"
+
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework", rev = "mainnet" }
+AptosStdlib = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-stdlib", rev = "mainnet" }
+
+[dev-addresses]
+aptosroom = "0x1234"
+
+[dev-dependencies]
