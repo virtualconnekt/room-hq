@@ -165,55 +165,132 @@ module aptosroom::keycard {
     }
 
     // ============================================================
-    // INTERNAL FUNCTIONS (called by other modules via capability)
+    // INTERNAL FUNCTIONS (called by other modules via friend)
     // ============================================================
+
+    // Friend declarations for modules that can update keycard stats
+    friend aptosroom::settlement;
+    friend aptosroom::jury;
+    friend aptosroom::variance;
 
     /// Add a completed task to keycard stats
     /// Called by settlement module after room settles
-    // TODO: Implement add_task_completion(
-    //   addr: address,
-    //   room_id: u64,
-    //   category: String,
-    //   score: u64,
-    // )
-    // Steps:
-    // 1. Assert has_keycard(addr)
-    // 2. Borrow keycard mutably
-    // 3. Increment tasks_completed
-    // 4. Update avg_score using weighted average formula:
-    //    new_avg = ((old_avg * old_count) + new_score) / new_count
-    // 5. Emit KeycardStatsUpdated event
+    /// Uses weighted average formula: new_avg = ((old_avg * old_count) + new_score) / new_count
+    public(friend) fun add_task_completion(
+        addr: address,
+        score: u64,
+    ) acquires Keycard {
+        assert!(exists<Keycard>(addr), errors::E_KEYCARD_NOT_FOUND());
+        
+        let keycard = borrow_global_mut<Keycard>(addr);
+        let old_count = keycard.tasks_completed;
+        let old_avg = keycard.avg_score;
+        
+        // Increment task count
+        keycard.tasks_completed = old_count + 1;
+        
+        // Calculate new weighted average
+        // new_avg = ((old_avg * old_count) + new_score) / new_count
+        let new_count = keycard.tasks_completed;
+        keycard.avg_score = ((old_avg * old_count) + score) / new_count;
+        
+        // Emit event
+        event::emit(KeycardStatsUpdated {
+            owner: addr,
+            tasks_completed: keycard.tasks_completed,
+            avg_score: keycard.avg_score,
+            jury_participations: keycard.jury_participations,
+            variance_flags: keycard.variance_flags,
+        });
+    }
 
     /// Increment jury participation count
-    /// Called by jury module when juror participates
-    // TODO: Implement increment_jury_participations(addr: address)
-    // Steps:
-    // 1. Assert has_keycard(addr)
-    // 2. Borrow keycard mutably
-    // 3. Increment jury_participations
-    // 4. Emit KeycardStatsUpdated event
+    /// Called by jury module when juror reveals their vote
+    public(friend) fun increment_jury_participations(addr: address) acquires Keycard {
+        assert!(exists<Keycard>(addr), errors::E_KEYCARD_NOT_FOUND());
+        
+        let keycard = borrow_global_mut<Keycard>(addr);
+        keycard.jury_participations = keycard.jury_participations + 1;
+        
+        // Emit event
+        event::emit(KeycardStatsUpdated {
+            owner: addr,
+            tasks_completed: keycard.tasks_completed,
+            avg_score: keycard.avg_score,
+            jury_participations: keycard.jury_participations,
+            variance_flags: keycard.variance_flags,
+        });
+    }
 
     /// Increment variance flags count
-    /// Called by variance module when juror is flagged
-    // TODO: Implement increment_variance_flags(addr: address)
-    // Steps:
-    // 1. Assert has_keycard(addr)
-    // 2. Borrow keycard mutably
-    // 3. Increment variance_flags
-    // 4. Emit KeycardStatsUpdated event
+    /// Called by variance module when juror vote is flagged as outlier
+    public(friend) fun increment_variance_flags(addr: address) acquires Keycard {
+        assert!(exists<Keycard>(addr), errors::E_KEYCARD_NOT_FOUND());
+        
+        let keycard = borrow_global_mut<Keycard>(addr);
+        keycard.variance_flags = keycard.variance_flags + 1;
+        
+        // Emit event
+        event::emit(KeycardStatsUpdated {
+            owner: addr,
+            tasks_completed: keycard.tasks_completed,
+            avg_score: keycard.avg_score,
+            jury_participations: keycard.jury_participations,
+            variance_flags: keycard.variance_flags,
+        });
+    }
 
-    /// Add a category to keycard
-    // TODO: Implement add_category(addr: address, category: String)
-    // Steps:
-    // 1. Assert has_keycard(addr)
-    // 2. Assert category not already in list
-    // 3. Push category to categories vector
+    /// Add a category to keycard holder's eligible categories
+    public(friend) fun add_category(addr: address, category: String) acquires Keycard {
+        assert!(exists<Keycard>(addr), errors::E_KEYCARD_NOT_FOUND());
+        
+        let keycard = borrow_global_mut<Keycard>(addr);
+        
+        // Check category not already in list
+        assert!(
+            !vector::contains(&keycard.categories, &category),
+            errors::E_ALREADY_REGISTERED()
+        );
+        
+        vector::push_back(&mut keycard.categories, category);
+    }
 
     /// Check if keycard holder is eligible for a category
-    // TODO: Implement is_eligible_for_category(addr: address, category: &String): bool
-    // Steps:
-    // 1. Return false if no keycard
-    // 2. Check if category is in categories vector
+    public fun is_eligible_for_category(addr: address, category: &String): bool acquires Keycard {
+        if (!exists<Keycard>(addr)) {
+            return false
+        };
+        let keycard = borrow_global<Keycard>(addr);
+        vector::contains(&keycard.categories, category)
+    }
+
+    // ============================================================
+    // TEST-ONLY FUNCTIONS
+    // ============================================================
+
+    #[test_only]
+    /// Initialize module for testing
+    public fun init_for_test(account: &signer) {
+        init_module(account);
+    }
+
+    #[test_only]
+    /// Test helper to add task completion
+    public fun test_add_task_completion(addr: address, score: u64) acquires Keycard {
+        add_task_completion(addr, score);
+    }
+
+    #[test_only]
+    /// Test helper to increment jury participations
+    public fun test_increment_jury_participations(addr: address) acquires Keycard {
+        increment_jury_participations(addr);
+    }
+
+    #[test_only]
+    /// Test helper to increment variance flags
+    public fun test_increment_variance_flags(addr: address) acquires Keycard {
+        increment_variance_flags(addr);
+    }
 
     // ============================================================
     // SOULBOUND ENFORCEMENT

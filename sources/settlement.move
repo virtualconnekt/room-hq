@@ -147,15 +147,24 @@ module aptosroom::settlement {
 
     #[view]
     /// Check if client has approved
-    // TODO: Implement is_approved(room_id: u64): bool
+    public fun is_approved(_room_id: u64): bool {
+        // TODO: Implement - check client approval status from room state
+        false
+    }
 
     #[view]
     /// Check if settlement is complete
-    // TODO: Implement is_settled(room_id: u64): bool
+    public fun is_settled(_room_id: u64): bool {
+        // TODO: Implement - check if room is in SETTLED state
+        false
+    }
 
     #[view]
     /// Get winner address
-    // TODO: Implement get_winner(room_id: u64): Option<address>
+    public fun get_winner(_room_id: u64): Option<address> {
+        // TODO: Implement - return winner from room state
+        option::none()
+    }
 
     // ============================================================
     // TESTS

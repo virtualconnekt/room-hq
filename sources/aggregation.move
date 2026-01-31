@@ -122,11 +122,17 @@ module aptosroom::aggregation {
 
     #[view]
     /// Get calculated jury score for a room
-    // TODO: Implement get_jury_score(room_id: u64): u64
+    public fun get_jury_score(_room_id: u64): u64 {
+        // TODO: Implement - get jury score from room state
+        0
+    }
 
     #[view]
     /// Get final score for a contributor
-    // TODO: Implement get_final_score(room_id: u64, contributor: address): u64
+    public fun get_final_score(_room_id: u64, _contributor: address): u64 {
+        // TODO: Implement - get final score from room state
+        0
+    }
 
     // ============================================================
     // TESTS
@@ -187,9 +193,6 @@ module aptosroom::aggregation {
     // ============================================================
     // TEST HELPERS
     // ============================================================
-
-    #[test_only]
-    use std::vector;
 
     #[test_only]
     fun test_calculate_median(scores: vector<u64>): u64 {

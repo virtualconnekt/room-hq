@@ -168,22 +168,45 @@ module aptosroom::juror_registry {
     // INTERNAL FUNCTIONS (for jury selection)
     // ============================================================
 
+    // Friend declarations for modules that need to query jurors
+    friend aptosroom::jury;
+
     /// Get list of eligible jurors for a category
-    // TODO: Implement get_eligible_jurors(category: &String): vector<address>
-    // Steps:
-    // 1. Check if category exists in registry
-    // 2. Return copy of juror list for that category
-    // 3. Return empty vector if category not found
+    public(friend) fun get_eligible_jurors(category: &String): vector<address> acquires JurorRegistry {
+        let registry = borrow_global<JurorRegistry>(@aptosroom);
+        if (!table::contains(&registry.categories, *category)) {
+            return vector::empty<address>()
+        };
+        *table::borrow(&registry.categories, *category)
+    }
 
     /// Get count of eligible jurors for a category
-    // TODO: Implement get_eligible_juror_count(category: &String): u64
-    // Steps:
-    // 1. Get juror list for category
-    // 2. Return vector length
+    public fun get_eligible_juror_count(category: &String): u64 acquires JurorRegistry {
+        let registry = borrow_global<JurorRegistry>(@aptosroom);
+        if (!table::contains(&registry.categories, *category)) {
+            return 0
+        };
+        vector::length(table::borrow(&registry.categories, *category))
+    }
 
     /// Check if there are enough jurors for selection
-    // TODO: Implement has_sufficient_jurors(category: &String, required: u64): bool
-    // Steps:
-    // 1. Get eligible count
-    // 2. Return count >= required
+    public fun has_sufficient_jurors(category: &String, required: u64): bool acquires JurorRegistry {
+        get_eligible_juror_count(category) >= required
+    }
+
+    // ============================================================
+    // TEST-ONLY FUNCTIONS
+    // ============================================================
+
+    #[test_only]
+    /// Initialize module for testing
+    public fun init_for_test(account: &signer) {
+        init_module(account);
+    }
+
+    #[test_only]
+    /// Test helper to get eligible jurors
+    public fun test_get_eligible_jurors(category: &String): vector<address> acquires JurorRegistry {
+        get_eligible_jurors(category)
+    }
 }
