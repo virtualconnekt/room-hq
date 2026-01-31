@@ -17,6 +17,7 @@ module aptosroom::vault {
     // Friend declarations
     friend aptosroom::room;
     friend aptosroom::settlement;
+    friend aptosroom::aggregation;
 
     // ============================================================
     // STRUCTS

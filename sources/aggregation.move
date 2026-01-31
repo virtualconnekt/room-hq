@@ -6,115 +6,208 @@
 /// ============================================================
 module aptosroom::aggregation {
     use std::vector;
-    use aptosroom::errors;
+    use std::option;
+    use aptos_framework::event;
+    use aptos_framework::timestamp;
     use aptosroom::constants;
+    use aptosroom::room;
+    use aptosroom::vault;
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
+
+    #[event]
+    struct JuryScoreComputed has drop, store {
+        room_id: u64,
+        jury_score: u64,
+        valid_vote_count: u64,
+        timestamp: u64,
+    }
+
+    #[event]
+    struct FinalScoreComputed has drop, store {
+        room_id: u64,
+        contributor: address,
+        client_score: u64,
+        jury_score: u64,
+        final_score: u64,
+        timestamp: u64,
+    }
+
+    #[event]
+    struct RoomZeroVotesRefunded has drop, store {
+        room_id: u64,
+        timestamp: u64,
+    }
 
     // ============================================================
     // MEDIAN CALCULATION
     // ============================================================
 
     /// Calculate median of a score set
-    // TODO: Implement calculate_median(scores: vector<u64>): u64
-    //
-    // Algorithm:
-    // 1. If scores is empty: return 0 (triggers zero-vote path)
-    // 2. Sort scores ascending
-    // 3. Let n = length of scores
-    // 4. If n is odd:
-    //    - Return scores[n / 2]
-    // 5. If n is even:
-    //    - mid1 = scores[(n / 2) - 1]
-    //    - mid2 = scores[n / 2]
-    //    - Return floor((mid1 + mid2) / 2)
-    //
-    // Example (odd):
-    //   Scores: [80, 82, 85, 87, 90] → median = 85
-    //
-    // Example (even):
-    //   Scores: [80, 82, 87, 90] → median = floor((82 + 87) / 2) = 84
+    public fun calculate_median(scores: vector<u64>): u64 {
+        let len = vector::length(&scores);
+        
+        // If empty: return 0 (triggers zero-vote path)
+        if (len == 0) {
+            return 0
+        };
 
-    /// Sort vector in ascending order (simple insertion sort)
-    // TODO: Implement sort_ascending(scores: &mut vector<u64>)
-    //
-    // Steps (insertion sort):
-    // 1. For i from 1 to len-1:
-    //    a. key = scores[i]
-    //    b. j = i - 1
-    //    c. While j >= 0 && scores[j] > key:
-    //       - scores[j + 1] = scores[j]
-    //       - j = j - 1
-    //    d. scores[j + 1] = key
+        // Sort scores ascending
+        let sorted = sort_ascending(scores);
+
+        // Calculate median
+        if (len % 2 == 1) {
+            // Odd: return middle element
+            *vector::borrow(&sorted, len / 2)
+        } else {
+            // Even: average of middle two (floor)
+            let mid1 = *vector::borrow(&sorted, (len / 2) - 1);
+            let mid2 = *vector::borrow(&sorted, len / 2);
+            (mid1 + mid2) / 2
+        }
+    }
+
+    /// Sort vector in ascending order (simple bubble sort for small arrays)
+    public fun sort_ascending(scores: vector<u64>): vector<u64> {
+        let len = vector::length(&scores);
+        if (len <= 1) {
+            return scores
+        };
+
+        let sorted = scores;
+        let i = 0;
+        while (i < len) {
+            let j = 0;
+            while (j < len - 1 - i) {
+                let a = *vector::borrow(&sorted, j);
+                let b = *vector::borrow(&sorted, j + 1);
+                if (a > b) {
+                    // Swap
+                    *vector::borrow_mut(&mut sorted, j) = b;
+                    *vector::borrow_mut(&mut sorted, j + 1) = a;
+                };
+                j = j + 1;
+            };
+            i = i + 1;
+        };
+
+        sorted
+    }
 
     // ============================================================
     // JURY SCORE CALCULATION
     // ============================================================
 
     /// Calculate jury score from room votes
-    // TODO: Implement calculate_jury_score(
-    //   room_id: u64,
-    //   valid_scores: vector<u64>,  // Non-flagged revealed scores
-    // ): u64
-    //
-    // Steps:
-    // 1. If empty: return 0 (zero-vote case)
-    // 2. Calculate median of valid_scores
-    // 3. Return median
+    public fun calculate_jury_score(
+        room_id: u64,
+        valid_scores: vector<u64>,
+    ): u64 {
+        let len = vector::length(&valid_scores);
+        
+        // If empty: return 0 (zero-vote case)
+        if (len == 0) {
+            return 0
+        };
+
+        // Calculate median of valid_scores
+        let median = calculate_median(valid_scores);
+
+        // Store jury score in room
+        room::set_jury_score(room_id, median);
+
+        // Emit event
+        event::emit(JuryScoreComputed {
+            room_id,
+            jury_score: median,
+            valid_vote_count: len,
+            timestamp: timestamp::now_seconds(),
+        });
+
+        median
+    }
 
     // ============================================================
     // FINAL SCORE CALCULATION
     // ============================================================
 
     /// Calculate final score using Dual-Key weights
-    // TODO: Implement calculate_final_score(
-    //   client_score: u64,
-    //   jury_score: u64,
-    // ): u64
-    //
-    // Formula:
-    //   final_score = (client_score * CLIENT_WEIGHT + jury_score * JURY_WEIGHT) 
-    //                 / WEIGHT_DENOMINATOR
-    //
-    // With CLIENT_WEIGHT = 60, JURY_WEIGHT = 40, DENOMINATOR = 100:
-    //   final_score = (client_score * 60 + jury_score * 40) / 100
-    //
-    // Example:
-    //   client_score = 90, jury_score = 80
-    //   final = (90 * 60 + 80 * 40) / 100 = (5400 + 3200) / 100 = 86
+    public fun calculate_final_score(
+        client_score: u64,
+        jury_score: u64,
+    ): u64 {
+        let client_weight = constants::CLIENT_WEIGHT();
+        let jury_weight = constants::JURY_WEIGHT();
+        let denominator = constants::WEIGHT_DENOMINATOR();
+
+        // final_score = (client_score * 60 + jury_score * 40) / 100
+        (client_score * client_weight + jury_score * jury_weight) / denominator
+    }
 
     /// Process all submissions and calculate final scores
-    // TODO: Implement process_final_scores(
-    //   room_id: u64,
-    //   jury_score: u64,
-    // )
-    //
-    // Steps:
-    // 1. For each submission in room:
-    //    a. Get client_score (or 0 if not set)
-    //    b. Calculate final_score
-    //    c. Store final_score in room.final_scores
+    public fun process_final_scores(room_id: u64, jury_score: u64) {
+        let contributors = room::get_contributor_list(room_id);
+        let len = vector::length(&contributors);
+
+        let i = 0;
+        while (i < len) {
+            let contributor = *vector::borrow(&contributors, i);
+            
+            // Get client_score (or 0 if not set)
+            let client_score_opt = room::get_client_score(room_id, contributor);
+            let client_score = if (option::is_some(&client_score_opt)) {
+                *option::borrow(&client_score_opt)
+            } else {
+                0
+            };
+
+            // Calculate final score
+            let final_score = calculate_final_score(client_score, jury_score);
+
+            // Store final score in room
+            room::set_final_score(room_id, contributor, final_score);
+
+            // Emit event
+            event::emit(FinalScoreComputed {
+                room_id,
+                contributor,
+                client_score,
+                jury_score,
+                final_score,
+                timestamp: timestamp::now_seconds(),
+            });
+
+            i = i + 1;
+        };
+    }
 
     // ============================================================
     // ZERO VOTES HANDLING
     // ============================================================
 
     /// Handle case when all votes are flagged
-    // TODO: Implement handle_zero_valid_votes(
-    //   room_id: u64,
-    // ): bool  // Returns true if this is a zero-vote case
-    //
-    // CTO RULE (Zero Valid Votes):
-    // 1. Refund escrow to client (100%)
-    // 2. Keycards remain UNCHANGED
-    // 3. Transition directly FINALIZED → SETTLED
-    // 4. Emit RoomZeroVotesRefunded event
-    //
-    // Steps:
-    // 1. Check if valid_scores count == 0
-    // 2. If yes:
-    //    a. Call vault::refund_to_client(room_id)
-    //    b. Set room state to SETTLED
-    //    c. Return true
-    // 3. Return false
+    /// CTO RULE: Refund escrow to client (100%), keycards unchanged
+    public fun handle_zero_valid_votes(room_id: u64): bool {
+        let valid_scores = room::get_revealed_scores(room_id);
+        
+        // Check if valid_scores count == 0
+        if (vector::length(&valid_scores) == 0) {
+            // Refund escrow to client
+            vault::refund_to_client(room_id);
+
+            // Emit event
+            event::emit(RoomZeroVotesRefunded {
+                room_id,
+                timestamp: timestamp::now_seconds(),
+            });
+
+            return true
+        };
+
+        false
+    }
 
     // ============================================================
     // VIEW FUNCTIONS
@@ -122,16 +215,14 @@ module aptosroom::aggregation {
 
     #[view]
     /// Get calculated jury score for a room
-    public fun get_jury_score(_room_id: u64): u64 {
-        // TODO: Implement - get jury score from room state
-        0
+    public fun get_jury_score(room_id: u64): u64 {
+        room::get_jury_score(room_id)
     }
 
     #[view]
     /// Get final score for a contributor
-    public fun get_final_score(_room_id: u64, _contributor: address): u64 {
-        // TODO: Implement - get final score from room state
-        0
+    public fun get_final_score(room_id: u64, contributor: address): u64 {
+        room::get_final_score(room_id, contributor)
     }
 
     // ============================================================
