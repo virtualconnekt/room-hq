@@ -54,18 +54,33 @@ module aptosroom::settlement {
     /// Client approves settlement
     /// CTO RULE_GOLDKEY_001: Valid only in FINALIZED state
     /// CTO RULE_GOLDKEY_002: Single-use, irreversible
-    // TODO: Implement approve_settlement(
-    //   account: &signer,
-    //   room_id: u64,
-    // )
-    //
-    // Steps:
-    // 1. Get client address from signer
-    // 2. Assert room.state == STATE_FINALIZED (E_NOT_FINALIZED)
-    // 3. Assert signer == room.client (E_NOT_CLIENT)
-    // 4. Assert !room.client_approved (E_APPROVAL_ALREADY_GIVEN)
-    // 5. Set room.client_approved = true
-    // 6. Emit SettlementApproved event
+    public entry fun approve_settlement(
+        account: &signer,
+        room_id: u64,
+    ) {
+        let client = signer::address_of(account);
+
+        // Assert room.state == STATE_FINALIZED
+        let state = room::get_state(room_id);
+        assert!(state == constants::STATE_FINALIZED(), errors::E_NOT_FINALIZED());
+
+        // Assert signer == room.client
+        let room_client = room::get_client(room_id);
+        assert!(client == room_client, errors::E_NOT_CLIENT());
+
+        // Assert !room.client_approved (single-use)
+        assert!(!room::is_client_approved(room_id), errors::E_APPROVAL_ALREADY_GIVEN());
+
+        // Set room.client_approved = true
+        room::set_client_approved(room_id);
+
+        // Emit event
+        event::emit(SettlementApproved {
+            room_id,
+            client,
+            timestamp: timestamp::now_seconds(),
+        });
+    }
 
     // ============================================================
     // SETTLEMENT EXECUTION
@@ -73,76 +88,123 @@ module aptosroom::settlement {
 
     /// Execute settlement and release funds
     /// INVARIANT_DUAL_KEY_001: Both keys must be present
-    // TODO: Implement execute_settlement(room_id: u64)
-    //
-    // CTO MANDATORY: This function reads approval state from room,
-    //                never accepts approval as a parameter.
-    //
-    // Steps:
-    // 1. Assert room.state == STATE_FINALIZED (E_NOT_FINALIZED)
-    // 2. Assert room.jury_score_computed (E_JURY_NOT_FINALIZED)
-    // 3. Assert room.client_approved (E_CLIENT_NOT_APPROVED)
-    //    ^ INVARIANT_DUAL_KEY_001: Both keys verified
-    // 4. Determine winner
-    // 5. Release funds to winner
-    // 6. Update all keycards
-    // 7. Set room.state = STATE_SETTLED
-    // 8. Emit RoomSettled event
+    public entry fun execute_settlement(account: &signer, room_id: u64) {
+        // Anyone can call, but both keys must be present
+        let _ = signer::address_of(account);
+
+        // Assert room.state == STATE_FINALIZED
+        let state = room::get_state(room_id);
+        assert!(state == constants::STATE_FINALIZED(), errors::E_NOT_FINALIZED());
+
+        // Assert jury score computed (Silver Key)
+        assert!(room::is_jury_score_computed(room_id), errors::E_JURY_NOT_FINALIZED());
+
+        // Assert client approved (Gold Key)
+        // INVARIANT_DUAL_KEY_001: Both keys verified
+        assert!(room::is_client_approved(room_id), errors::E_CLIENT_NOT_APPROVED());
+
+        // Determine winner
+        let (winner, final_score) = determine_winner(room_id);
+
+        // Release funds to winner
+        release_funds(room_id, winner);
+
+        // Update all keycards
+        update_all_keycards(room_id, winner);
+
+        // Set room.state = STATE_SETTLED via friend function
+        room::complete_settlement(room_id, winner);
+
+        // Emit event
+        event::emit(RoomSettled {
+            room_id,
+            winner,
+            final_score,
+            payout_amount: room::get_task_reward(room_id),
+            timestamp: timestamp::now_seconds(),
+        });
+    }
 
     // ============================================================
     // WINNER DETERMINATION
     // ============================================================
 
     /// Determine winner from final scores
-    // TODO: Implement determine_winner(room_id: u64): (address, u64)
-    //
-    // Steps:
-    // 1. Get all contributors from room
-    // 2. For each contributor:
-    //    a. Get final_score from room.final_scores
-    //    b. If final_score > highest:
-    //       - highest = final_score
-    //       - winner = contributor
-    // 3. Return (winner, highest_score)
-    //
-    // Tiebreaker (if scores equal):
-    //   First submission by timestamp wins
+    /// Tiebreaker: First submission by index wins
+    fun determine_winner(room_id: u64): (address, u64) {
+        let contributors = room::get_contributor_list(room_id);
+        let len = vector::length(&contributors);
+        
+        // Must have at least one contributor
+        assert!(len > 0, errors::E_NO_VALID_VOTES());
+
+        let highest_score: u64 = 0;
+        let winner = *vector::borrow(&contributors, 0);
+
+        let i = 0;
+        while (i < len) {
+            let contributor = *vector::borrow(&contributors, i);
+            let score = room::get_final_score(room_id, contributor);
+            
+            // Strict greater than: first submission wins ties
+            if (score > highest_score) {
+                highest_score = score;
+                winner = contributor;
+            };
+            i = i + 1;
+        };
+
+        (winner, highest_score)
+    }
 
     // ============================================================
     // FUND RELEASE
     // ============================================================
 
     /// Release funds to winner
-    // TODO: Implement release_funds(
-    //   room_id: u64,
-    //   winner: address,
-    // )
-    //
-    // Steps:
-    // 1. Get vault for room
-    // 2. Unlock vault
-    // 3. Transfer task_reward to winner
-    // 4. Emit EscrowReleased event
+    fun release_funds(room_id: u64, winner: address) {
+        // Get task reward amount
+        let payout = room::get_task_reward(room_id);
+
+        // Unlock vault and release to winner
+        vault::unlock_vault(room_id);
+        vault::release_to_winner(room_id, winner, payout);
+    }
 
     // ============================================================
     // KEYCARD UPDATES
     // ============================================================
 
     /// Update all participant keycards after settlement
-    // TODO: Implement update_all_keycards(
-    //   room_id: u64,
-    //   winner: address,
-    // )
-    //
-    // Steps:
-    // 1. For each contributor:
-    //    a. Get their final_score
-    //    b. Call keycard::add_task_completion(contributor, room_id, category, score)
-    //    c. Emit KeycardUpdated event
-    // 
-    // 2. For each juror:
-    //    a. Call keycard::increment_jury_participations(juror)
-    //    (Variance flags already incremented during variance detection)
+    fun update_all_keycards(room_id: u64, winner: address) {
+        let contributors = room::get_contributor_list(room_id);
+        let len = vector::length(&contributors);
+
+        // Update each contributor's keycard
+        let i = 0;
+        while (i < len) {
+            let contributor = *vector::borrow(&contributors, i);
+            let score = room::get_final_score(room_id, contributor);
+            let is_winner = (contributor == winner);
+
+            // Add task completion to keycard
+            keycard::add_task_completion(contributor, score);
+
+            // Emit event
+            event::emit(KeycardUpdated {
+                owner: contributor,
+                room_id,
+                score,
+                is_winner,
+                timestamp: timestamp::now_seconds(),
+            });
+
+            i = i + 1;
+        };
+
+        // Note: Jury participation already incremented during reveal_vote
+        // Note: Variance flags already incremented during variance detection
+    }
 
     // ============================================================
     // VIEW FUNCTIONS
@@ -150,23 +212,30 @@ module aptosroom::settlement {
 
     #[view]
     /// Check if client has approved
-    public fun is_approved(_room_id: u64): bool {
-        // TODO: Implement - check client approval status from room state
-        false
+    public fun is_approved(room_id: u64): bool {
+        room::is_client_approved(room_id)
     }
 
     #[view]
     /// Check if settlement is complete
-    public fun is_settled(_room_id: u64): bool {
-        // TODO: Implement - check if room is in SETTLED state
-        false
+    public fun is_settled(room_id: u64): bool {
+        room::is_settled(room_id)
     }
 
     #[view]
     /// Get winner address
-    public fun get_winner(_room_id: u64): Option<address> {
-        // TODO: Implement - return winner from room state
-        option::none()
+    public fun get_winner(room_id: u64): Option<address> {
+        room::get_winner(room_id)
+    }
+
+    // ============================================================
+    // TEST HELPERS
+    // ============================================================
+
+    #[test_only]
+    /// Test helper to determine winner
+    public fun test_determine_winner(room_id: u64): (address, u64) {
+        determine_winner(room_id)
     }
 
     // ============================================================
