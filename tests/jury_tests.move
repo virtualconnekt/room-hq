@@ -195,17 +195,61 @@ module aptosroom::jury_tests {
 
     #[test]
     /// Test hash computation is deterministic
-    // TODO: Implement test_hash_computation_deterministic
     fun test_hash_computation_deterministic() {
         // Same score + salt should always produce same hash
-        // TODO: Implement
+        let score: u64 = 85;
+        let salt = vector[1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8];
+        
+        let hash1 = jury::test_compute_commit_hash(score, salt);
+        let hash2 = jury::test_compute_commit_hash(score, salt);
+        
+        // Same inputs = same hash (deterministic)
+        assert!(hash1 == hash2, 0);
+        
+        // Hash should be 32 bytes (SHA3-256)
+        assert!(vector::length(&hash1) == 32, 1);
     }
 
     #[test]
     /// Test different inputs produce different hashes
-    // TODO: Implement test_hash_different_inputs
     fun test_hash_different_inputs() {
-        // Different score OR different salt should produce different hash
-        // TODO: Implement
+        let salt = vector[1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8];
+        
+        // Different scores with same salt
+        let hash_85 = jury::test_compute_commit_hash(85, salt);
+        let hash_86 = jury::test_compute_commit_hash(86, salt);
+        assert!(hash_85 != hash_86, 0);
+        
+        // Same score with different salt
+        let salt2 = vector[8u8, 7u8, 6u8, 5u8, 4u8, 3u8, 2u8, 1u8];
+        let hash_salt1 = jury::test_compute_commit_hash(85, salt);
+        let hash_salt2 = jury::test_compute_commit_hash(85, salt2);
+        assert!(hash_salt1 != hash_salt2, 1);
+    }
+
+    #[test]
+    /// Test commit-reveal round trip integrity
+    fun test_commit_reveal_round_trip() {
+        // Simulate what a juror would do off-chain
+        let score: u64 = 82;
+        let salt = vector[0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE, 0xBA, 0xBE];
+        
+        // Step 1: Compute commit hash (off-chain)
+        let commit_hash = jury::test_compute_commit_hash(score, salt);
+        
+        // Step 2: Later, recompute with same values (on-chain verification)
+        let reveal_hash = jury::test_compute_commit_hash(score, salt);
+        
+        // They must match for reveal to succeed
+        assert!(commit_hash == reveal_hash, 0);
+        
+        // Try to cheat by changing score
+        let cheat_hash = jury::test_compute_commit_hash(90, salt);
+        assert!(commit_hash != cheat_hash, 1); // Cheater detected!
+        
+        // Try to cheat by changing salt
+        let cheat_salt = vector[0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+        let cheat_hash2 = jury::test_compute_commit_hash(82, cheat_salt);
+        assert!(commit_hash != cheat_hash2, 2); // Cheater detected!
     }
 }

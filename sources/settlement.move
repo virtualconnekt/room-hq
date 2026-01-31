@@ -14,6 +14,9 @@ module aptosroom::settlement {
     use aptos_framework::timestamp;
     use aptosroom::errors;
     use aptosroom::constants;
+    use aptosroom::room;
+    use aptosroom::vault;
+    use aptosroom::keycard;
 
     // ============================================================
     // EVENTS
