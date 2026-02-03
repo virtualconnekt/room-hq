@@ -917,4 +917,22 @@ module aptosroom::room {
     public fun test_complete_settlement(room_id: u64, winner: address) acquires RoomRegistry, Room {
         complete_settlement(room_id, winner);
     }
+
+    #[test_only]
+    /// Test helper to set room state directly
+    public fun test_set_state(room_id: u64, new_state: u8) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        room.state = new_state;
+    }
+
+    #[test_only]
+    /// Test helper to add contributor to room (simulates submission)
+    public fun test_add_contributor(room_id: u64, contributor: address) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        vector::push_back(&mut room.contributor_list, contributor);
+    }
 }
