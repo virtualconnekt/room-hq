@@ -4,10 +4,10 @@ version = "0.1.0"
 authors = ["AptosRoom Team"]
 
 [addresses]
-aptosroom = "0xCAFE"
+aptosroom = "0x34a1f012718433e11b3515330d2d65093a13ffccc6b31883f490d653382eedcc"
 
 [dependencies]
-AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework", rev = "mainnet" }
-AptosStdlib = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-stdlib", rev = "mainnet" }
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework", rev = "main" }
+AptosStdlib = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-stdlib", rev = "main" }
 
 [dev-dependencies]
