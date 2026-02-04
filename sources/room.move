@@ -1143,4 +1143,31 @@ module aptosroom::room {
         let room = borrow_global_mut<Room>(room_owner);
         vector::push_back(&mut room.contributor_list, contributor);
     }
+
+    #[test_only]
+    /// Test helper to set contributor tier directly
+    public fun test_set_contributor_tier(room_id: u64, contributor: address, tier: u8) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        table::upsert(&mut room.contributor_tiers, contributor, tier);
+    }
+
+    #[test_only]
+    /// Test helper to set contributor jury score directly
+    public fun test_set_contributor_jury_score(room_id: u64, contributor: address, score: u64) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        table::upsert(&mut room.contributor_jury_scores, contributor, score);
+    }
+
+    #[test_only]
+    /// Test helper to mark tiers as computed
+    public fun test_mark_tiers_computed(room_id: u64) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        room.tiers_computed = true;
+    }
 }

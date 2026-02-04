@@ -568,4 +568,14 @@ module aptosroom::jury {
     public fun test_compute_commit_hash(score: u64, salt: vector<u8>): vector<u8> {
         compute_commit_hash(score, salt)
     }
+
+    #[test_only]
+    /// Test helper to compute tier commit hash
+    public fun test_compute_tier_commit_hash(
+        tier_a_selections: vector<address>,
+        tier_b_selections: vector<address>,
+        salt: vector<u8>,
+    ): vector<u8> {
+        compute_tier_commit_hash(&tier_a_selections, &tier_b_selections, &salt)
+    }
 }

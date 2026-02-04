@@ -17,7 +17,8 @@
 6. [Phase 5: Scoring & Variance Tests](#phase-5-scoring--variance-tests)
 7. [Phase 6: Settlement Tests](#phase-6-settlement-tests)
 8. [Phase 7: Edge Case Tests](#phase-7-edge-case-tests)
-9. [End-to-End Scenario Tests](#end-to-end-scenario-tests)
+9. [Phase 8: Tier System Tests](#phase-8-tier-system-tests)
+10. [End-to-End Scenario Tests](#end-to-end-scenario-tests)
 
 ---
 
@@ -34,7 +35,8 @@
 | 5 | Scoring & Variance | 5 | Critical |
 | 6 | Settlement | 6 | Critical |
 | 7 | Edge Cases | 6 | Medium |
-| E2E | Full Scenarios | 3 | Critical |
+| 8 | Tier System | 12 | Critical |
+| E2E | Full Scenarios | 4 | Critical |
 
 ### Test Accounts Needed
 
@@ -1412,9 +1414,372 @@ All votes flagged → Zero valid votes
 - [ ] E2E 1: Happy path
 - [ ] E2E 2: Zero valid votes
 - [ ] E2E 3: Concurrent rooms
+- [ ] E2E 4: Full tier-based flow
+
+### Phase 8: Tier System
+- [ ] Test 8.1: Tier slot allocation (< 10 contributors)
+- [ ] Test 8.2: Tier slot allocation (10-20 contributors)
+- [ ] Test 8.3: Tier slot allocation (> 20 contributors)
+- [ ] Test 8.4: Commit tier vote
+- [ ] Test 8.5: Reveal tier vote
+- [ ] Test 8.6: Wrong tier A count rejected
+- [ ] Test 8.7: Wrong tier B count rejected
+- [ ] Test 8.8: Duplicate in A and B rejected
+- [ ] Test 8.9: Non-contributor selection rejected
+- [ ] Test 8.10: Tier aggregation majority vote
+- [ ] Test 8.11: Tier variance (2-tier gap flagged)
+- [ ] Test 8.12: Tier final score calculation
 
 ---
 
-**Document Version:** 1.0  
+## Phase 8: Tier System Tests
+
+### Test 8.1: Tier Slot Allocation (< 10 Contributors)
+
+**Purpose:** Verify correct slot counts for small rooms
+
+**CLI Command:**
+```bash
+aptos move view \
+  --function-id 0x34a1f0...::constants::get_tier_a_slots \
+  --args u64:5
+
+aptos move view \
+  --function-id 0x34a1f0...::constants::get_tier_b_slots \
+  --args u64:5
+```
+
+**Expected Result:**
+- Tier A slots: 1
+- Tier B slots: 2
+
+---
+
+### Test 8.2: Tier Slot Allocation (10-20 Contributors)
+
+**Purpose:** Verify correct slot counts for medium rooms
+
+**CLI Command:**
+```bash
+aptos move view \
+  --function-id 0x34a1f0...::constants::get_tier_a_slots \
+  --args u64:15
+
+aptos move view \
+  --function-id 0x34a1f0...::constants::get_tier_b_slots \
+  --args u64:15
+```
+
+**Expected Result:**
+- Tier A slots: 3
+- Tier B slots: 4
+
+---
+
+### Test 8.3: Tier Slot Allocation (> 20 Contributors)
+
+**Purpose:** Verify correct slot counts for large rooms
+
+**CLI Command:**
+```bash
+aptos move view \
+  --function-id 0x34a1f0...::constants::get_tier_a_slots \
+  --args u64:25
+
+aptos move view \
+  --function-id 0x34a1f0...::constants::get_tier_b_slots \
+  --args u64:25
+```
+
+**Expected Result:**
+- Tier A slots: 5
+- Tier B slots: 7
+
+---
+
+### Test 8.4: Commit Tier Vote
+
+**Purpose:** Verify juror can commit tier selections
+
+**Prerequisites:**
+1. Room in JURY_ACTIVE state
+2. Juror selected for room
+3. At least 3 contributors (for slot testing)
+
+**Compute Hash Off-Chain:**
+```python
+import hashlib
+from typing import List
+
+def compute_tier_commit_hash(
+    tier_a: List[str],  # Addresses for Tier A
+    tier_b: List[str],  # Addresses for Tier B
+    salt: bytes
+) -> str:
+    # BCS serialize addresses (simplified)
+    data = b''
+    for addr in tier_a:
+        data += bytes.fromhex(addr[2:])  # Remove 0x prefix
+    for addr in tier_b:
+        data += bytes.fromhex(addr[2:])
+    data += salt
+    return '0x' + hashlib.sha3_256(data).hexdigest()
+```
+
+**CLI Command:**
+```bash
+aptos move run \
+  --function-id 0x34a1f0...::jury::commit_tier_vote \
+  --args u64:ROOM_ID "hex:COMMIT_HASH" \
+  --assume-yes
+```
+
+**Expected Result:**
+- Transaction succeeds
+- TierVoteCommitted event emitted
+- `has_committed_tier_vote(room_id, juror)` returns true
+
+---
+
+### Test 8.5: Reveal Tier Vote
+
+**Purpose:** Verify juror can reveal tier selections
+
+**Prerequisites:**
+1. Room in JURY_REVEAL state
+2. Juror has committed tier vote
+
+**CLI Command:**
+```bash
+aptos move run \
+  --function-id 0x34a1f0...::jury::reveal_tier_vote \
+  --args u64:ROOM_ID \
+    "vector<address>:TIER_A_ADDRESSES" \
+    "vector<address>:TIER_B_ADDRESSES" \
+    "hex:SALT" \
+  --assume-yes
+```
+
+**Expected Result:**
+- Transaction succeeds
+- TierVoteRevealed event emitted
+- `has_revealed_tier_vote(room_id, juror)` returns true
+- Keycard jury_participations incremented
+
+---
+
+### Test 8.6: Wrong Tier A Count Rejected
+
+**Purpose:** Verify exact slot count enforcement
+
+**CLI Command:**
+```bash
+# With 5 contributors, Tier A must be exactly 1
+# Try with 2 addresses - should fail
+aptos move run \
+  --function-id 0x34a1f0...::jury::reveal_tier_vote \
+  --args u64:ROOM_ID \
+    "vector<address>:addr1,addr2" \
+    "vector<address>:addr3,addr4" \
+    "hex:SALT" \
+  --assume-yes
+```
+
+**Expected Result:**
+- Transaction fails with `E_INVALID_TIER_A_COUNT` (611)
+
+---
+
+### Test 8.7: Wrong Tier B Count Rejected
+
+**Purpose:** Verify exact slot count enforcement
+
+**CLI Command:**
+```bash
+# With 5 contributors, Tier B must be exactly 2
+# Try with 1 address - should fail
+aptos move run \
+  --function-id 0x34a1f0...::jury::reveal_tier_vote \
+  --args u64:ROOM_ID \
+    "vector<address>:addr1" \
+    "vector<address>:addr2" \
+    "hex:SALT" \
+  --assume-yes
+```
+
+**Expected Result:**
+- Transaction fails with `E_INVALID_TIER_B_COUNT` (612)
+
+---
+
+### Test 8.8: Duplicate in A and B Rejected
+
+**Purpose:** Verify same address cannot be in both tiers
+
+**CLI Command:**
+```bash
+# Same address in both Tier A and Tier B
+aptos move run \
+  --function-id 0x34a1f0...::jury::reveal_tier_vote \
+  --args u64:ROOM_ID \
+    "vector<address>:addr1" \
+    "vector<address>:addr1,addr2" \
+    "hex:SALT" \
+  --assume-yes
+```
+
+**Expected Result:**
+- Transaction fails with `E_DUPLICATE_IN_TIERS` (613)
+
+---
+
+### Test 8.9: Non-Contributor Selection Rejected
+
+**Purpose:** Verify only actual contributors can be selected
+
+**CLI Command:**
+```bash
+# Address that didn't contribute to this room
+aptos move run \
+  --function-id 0x34a1f0...::jury::reveal_tier_vote \
+  --args u64:ROOM_ID \
+    "vector<address>:NON_CONTRIBUTOR_ADDR" \
+    "vector<address>:addr2,addr3" \
+    "hex:SALT" \
+  --assume-yes
+```
+
+**Expected Result:**
+- Transaction fails with `E_NOT_A_CONTRIBUTOR` (614)
+
+---
+
+### Test 8.10: Tier Aggregation Majority Vote
+
+**Purpose:** Verify majority voting determines final tier
+
+**Scenario:**
+- 5 jurors vote on contributor X
+- Juror 1: Tier A
+- Juror 2: Tier A  
+- Juror 3: Tier A
+- Juror 4: Tier B
+- Juror 5: Tier C
+
+**CLI Command (after aggregation):**
+```bash
+aptos move view \
+  --function-id 0x34a1f0...::aggregation::get_contributor_tier \
+  --args u64:ROOM_ID address:CONTRIBUTOR_X
+
+aptos move view \
+  --function-id 0x34a1f0...::aggregation::get_contributor_jury_score \
+  --args u64:ROOM_ID address:CONTRIBUTOR_X
+```
+
+**Expected Result:**
+- Tier: 1 (Tier A - majority)
+- Jury Score: 40
+
+---
+
+### Test 8.11: Tier Variance (2-Tier Gap Flagged)
+
+**Purpose:** Verify jurors 2+ tiers from majority are flagged
+
+**Scenario:**
+- Majority votes Tier A for contributor X
+- One juror votes Tier C (2 tiers away)
+
+**Expected Result:**
+- Juror who voted Tier C is flagged
+- Keycard variance_flags incremented for flagged juror
+- TierVarianceFlagged event emitted
+
+---
+
+### Test 8.12: Tier Final Score Calculation
+
+**Purpose:** Verify final score formula with tier system
+
+**Formula:** `Final = (Client × 60 / 100) + Tier Score`
+
+**Test Cases:**
+
+| Client Score | Tier | Tier Score | Expected Final |
+|--------------|------|------------|----------------|
+| 100 | A | 40 | 100 |
+| 100 | B | 30 | 90 |
+| 100 | C | 20 | 80 |
+| 90 | A | 40 | 94 |
+| 90 | B | 30 | 84 |
+| 90 | C | 20 | 74 |
+| 80 | A | 40 | 88 |
+| 50 | C | 20 | 50 |
+
+**CLI Command:**
+```bash
+aptos move view \
+  --function-id 0x34a1f0...::aggregation::get_final_score \
+  --args u64:ROOM_ID address:CONTRIBUTOR
+```
+
+---
+
+## E2E Test 4: Full Tier-Based Flow
+
+**Purpose:** Complete end-to-end test using tier system
+
+### Scenario Setup
+
+| Account | Role |
+|---------|------|
+| Client | Creates room with 1000 APT escrow |
+| Contributor A | Best work - should get Tier A |
+| Contributor B | Good work - should get Tier B |
+| Contributor C | Average work - should get Tier C |
+| Jurors 1-5 | All vote consistently |
+
+### Flow
+
+1. **Client creates room** with 3 contributors expected
+2. **3 contributors submit work**
+3. **Room transitions to JURY_ACTIVE**
+4. **5 jurors commit tier votes:**
+   - All select Contributor A for Tier A
+   - All select Contributor B for Tier B
+   - Contributor C defaults to Tier C
+5. **Room transitions to JURY_REVEAL**
+6. **5 jurors reveal tier votes**
+7. **Aggregate tier votes** → compute per-contributor tiers
+8. **Client sets scores:** A=95, B=85, C=75
+9. **Process final scores:**
+   - A: (95 × 0.6) + 40 = 97
+   - B: (85 × 0.6) + 30 = 81
+   - C: (75 × 0.6) + 20 = 65
+10. **Client approves settlement**
+11. **Execute tier settlement**
+12. **Contributor A wins** (highest score 97)
+
+### Verification
+
+```bash
+# Verify winner
+aptos move view \
+  --function-id 0x34a1f0...::settlement::get_winner \
+  --args u64:ROOM_ID
+# Expected: Contributor A address
+
+# Verify final scores
+aptos move view \
+  --function-id 0x34a1f0...::aggregation::get_final_score \
+  --args u64:ROOM_ID address:CONTRIBUTOR_A
+# Expected: 97
+```
+
+---
+
+**Document Version:** 1.1  
 **Last Updated:** February 4, 2026  
-**Contract:** `0x34a1f012718433e11b3515330d2d65093a13ffccc6b31883f490d653382eedcc`
+**Contract:** `0x34a1f012718433e11b3515330d2d65093a13ffccc6b31883f490d653382eedcc`  
+**Tier System:** Implemented (Phase 8 tests added)
