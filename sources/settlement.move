@@ -5,6 +5,7 @@
 ///   - INVARIANT_DUAL_KEY_001: Both keys required for payout
 ///   - INVARIANT_ROOM_004: Settled state is terminal
 /// PURPOSE: Dual-Key settlement and fund release
+/// NOTE: Supports both legacy score-based and tier-based jury scoring
 /// ============================================================
 module aptosroom::settlement {
     use std::signer;
@@ -226,6 +227,49 @@ module aptosroom::settlement {
     /// Get winner address
     public fun get_winner(room_id: u64): Option<address> {
         room::get_winner(room_id)
+    }
+
+    #[view]
+    /// Check if tiers have been computed (for tier-based settlement)
+    public fun are_tiers_computed(room_id: u64): bool {
+        room::are_tiers_computed(room_id)
+    }
+
+    /// Execute tier-based settlement (alternative to legacy settlement)
+    /// Uses per-contributor tier-based jury scores
+    public entry fun execute_tier_settlement(account: &signer, room_id: u64) {
+        let _ = signer::address_of(account);
+
+        // Assert room.state == STATE_FINALIZED
+        let state = room::get_state(room_id);
+        assert!(state == constants::STATE_FINALIZED(), errors::E_NOT_FINALIZED());
+
+        // Assert tiers have been computed (Silver Key for tier-based)
+        assert!(room::are_tiers_computed(room_id), errors::E_TIERS_NOT_COMPUTED());
+
+        // Assert client approved (Gold Key)
+        assert!(room::is_client_approved(room_id), errors::E_CLIENT_NOT_APPROVED());
+
+        // Determine winner using tier-based final scores
+        let (winner, final_score) = determine_winner(room_id);
+
+        // Release funds to winner
+        release_funds(room_id, winner);
+
+        // Update all keycards
+        update_all_keycards(room_id, winner);
+
+        // Set room.state = STATE_SETTLED
+        room::complete_settlement(room_id, winner);
+
+        // Emit event
+        event::emit(RoomSettled {
+            room_id,
+            winner,
+            final_score,
+            payout_amount: room::get_task_reward(room_id),
+            timestamp: timestamp::now_seconds(),
+        });
     }
 
     // ============================================================

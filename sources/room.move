@@ -58,12 +58,20 @@ module aptosroom::room {
         contributor_list: vector<address>,
         /// Selected jury pool
         jury_pool: vector<address>,
-        /// Votes: juror address -> Vote
+        /// Votes: juror address -> Vote (legacy, kept for compatibility)
         votes: Table<address, Vote>,
-        /// Whether jury score has been computed
+        /// Tier votes: juror address -> TierVote
+        tier_votes: Table<address, TierVote>,
+        /// Whether jury score has been computed (legacy)
         jury_score_computed: bool,
-        /// Computed jury score (median)
+        /// Computed jury score (legacy, median-based)
         jury_score: u64,
+        /// Per-contributor jury tier (1=A, 2=B, 3=C)
+        contributor_tiers: Table<address, u8>,
+        /// Per-contributor jury score (derived from tier: A=40, B=30, C=20)
+        contributor_jury_scores: Table<address, u64>,
+        /// Whether tier aggregation is complete
+        tiers_computed: bool,
         /// Final scores: contributor address -> final_score
         final_scores: Table<address, u64>,
         /// Whether client has approved settlement
@@ -102,6 +110,28 @@ module aptosroom::room {
         committed_at: u64,
         /// Whether flagged for variance
         variance_flagged: bool,
+    }
+
+    /// Tier vote from a juror (per-contributor tier assignment)
+    struct TierVote has store {
+        /// Juror address
+        juror: address,
+        /// Committed hash: SHA3(tier_a_addresses || tier_b_addresses || salt)
+        commit_hash: vector<u8>,
+        /// Addresses promoted to Tier A (revealed)
+        tier_a_selections: vector<address>,
+        /// Addresses promoted to Tier B (revealed)
+        tier_b_selections: vector<address>,
+        /// Salt used for commit
+        salt: vector<u8>,
+        /// Commit timestamp
+        committed_at: u64,
+        /// Reveal timestamp
+        revealed_at: u64,
+        /// Whether vote has been committed
+        committed: bool,
+        /// Whether vote has been revealed
+        revealed: bool,
     }
 
     /// Global room counter and registry
@@ -233,8 +263,12 @@ module aptosroom::room {
             contributor_list: vector::empty<address>(),
             jury_pool: vector::empty<address>(),
             votes: table::new<address, Vote>(),
+            tier_votes: table::new<address, TierVote>(),
             jury_score_computed: false,
             jury_score: 0,
+            contributor_tiers: table::new<address, u8>(),
+            contributor_jury_scores: table::new<address, u64>(),
+            tiers_computed: false,
             final_scores: table::new<address, u64>(),
             client_approved: false,
             winner: option::none<address>(),
@@ -789,6 +823,180 @@ module aptosroom::room {
         let room_owner = *table::borrow(&registry.rooms, room_id);
         let room = borrow_global_mut<Room>(room_owner);
         table::upsert(&mut room.final_scores, contributor, score);
+    }
+
+    // ============================================================
+    // TIER VOTE FUNCTIONS (for jury module)
+    // ============================================================
+
+    /// Add tier vote commit (called by jury module)
+    public(friend) fun add_tier_vote_commit(
+        room_id: u64,
+        juror: address,
+        commit_hash: vector<u8>,
+    ) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+
+        let tier_vote = TierVote {
+            juror,
+            commit_hash,
+            tier_a_selections: vector::empty<address>(),
+            tier_b_selections: vector::empty<address>(),
+            salt: vector::empty<u8>(),
+            committed_at: timestamp::now_seconds(),
+            revealed_at: 0,
+            committed: true,
+            revealed: false,
+        };
+
+        table::add(&mut room.tier_votes, juror, tier_vote);
+    }
+
+    /// Check if juror has committed tier vote
+    public fun has_committed_tier_vote(room_id: u64, juror: address): bool acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        table::contains(&room.tier_votes, juror)
+    }
+
+    /// Check if juror has revealed tier vote
+    public fun has_revealed_tier_vote(room_id: u64, juror: address): bool acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        if (!table::contains(&room.tier_votes, juror)) {
+            return false
+        };
+        let tier_vote = table::borrow(&room.tier_votes, juror);
+        tier_vote.revealed
+    }
+
+    /// Get tier vote commit hash
+    public fun get_tier_vote_commit(room_id: u64, juror: address): vector<u8> acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        let tier_vote = table::borrow(&room.tier_votes, juror);
+        tier_vote.commit_hash
+    }
+
+    /// Mark tier vote as revealed (called by jury module)
+    public(friend) fun mark_tier_vote_revealed(
+        room_id: u64,
+        juror: address,
+        tier_a_selections: vector<address>,
+        tier_b_selections: vector<address>,
+        salt: vector<u8>,
+    ) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        let tier_vote = table::borrow_mut(&mut room.tier_votes, juror);
+
+        tier_vote.tier_a_selections = tier_a_selections;
+        tier_vote.tier_b_selections = tier_b_selections;
+        tier_vote.salt = salt;
+        tier_vote.revealed_at = timestamp::now_seconds();
+        tier_vote.revealed = true;
+    }
+
+    /// Get juror's Tier A selections
+    public fun get_juror_tier_a_selections(room_id: u64, juror: address): vector<address> acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        let tier_vote = table::borrow(&room.tier_votes, juror);
+        tier_vote.tier_a_selections
+    }
+
+    /// Get juror's Tier B selections
+    public fun get_juror_tier_b_selections(room_id: u64, juror: address): vector<address> acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        let tier_vote = table::borrow(&room.tier_votes, juror);
+        tier_vote.tier_b_selections
+    }
+
+    /// Check if address is a valid contributor in room
+    public fun is_contributor(room_id: u64, contributor: address): bool acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        vector::contains(&room.contributor_list, &contributor)
+    }
+
+    /// Get contributor count
+    public fun get_contributor_count(room_id: u64): u64 acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        vector::length(&room.contributor_list)
+    }
+
+    /// Set contributor tier (called by aggregation module)
+    public(friend) fun set_contributor_tier(room_id: u64, contributor: address, tier: u8) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        table::upsert(&mut room.contributor_tiers, contributor, tier);
+    }
+
+    /// Set contributor jury score (called by aggregation module)
+    public(friend) fun set_contributor_jury_score(room_id: u64, contributor: address, score: u64) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        table::upsert(&mut room.contributor_jury_scores, contributor, score);
+    }
+
+    /// Mark tiers as computed
+    public(friend) fun mark_tiers_computed(room_id: u64) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        room.tiers_computed = true;
+    }
+
+    /// Check if tiers are computed
+    public fun are_tiers_computed(room_id: u64): bool acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        room.tiers_computed
+    }
+
+    /// Get contributor tier
+    public fun get_contributor_tier(room_id: u64, contributor: address): u8 acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        if (table::contains(&room.contributor_tiers, contributor)) {
+            *table::borrow(&room.contributor_tiers, contributor)
+        } else {
+            constants::TIER_C() // Default tier
+        }
+    }
+
+    /// Get contributor jury score
+    public fun get_contributor_jury_score(room_id: u64, contributor: address): u64 acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        if (table::contains(&room.contributor_jury_scores, contributor)) {
+            *table::borrow(&room.contributor_jury_scores, contributor)
+        } else {
+            constants::TIER_C_SCORE() // Default score
+        }
+    }
+
+    /// Check if juror is in jury pool
+    public fun is_juror(room_id: u64, juror: address): bool acquires RoomRegistry, Room {
+        let jury_pool = get_jury_pool(room_id);
+        vector::contains(&jury_pool, &juror)
     }
 
     /// Mark client approved (called by settlement module)

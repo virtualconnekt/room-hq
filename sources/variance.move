@@ -2,7 +2,9 @@
 /// MODULE: Variance
 /// SPEC: EXECUTION_TASKS_BY_PHASE.md Section 2.6
 /// PURPOSE: Nearest-neighbor outlier detection for jury votes
-/// THRESHOLD: 15 points (CTO-locked)
+///          + Tier-based variance detection for tier voting
+/// THRESHOLD: 15 points (CTO-locked) for score-based
+///            2 tiers difference for tier-based
 /// ============================================================
 module aptosroom::variance {
     use std::vector;
@@ -22,6 +24,17 @@ module aptosroom::variance {
         juror: address,
         score: u64,
         min_distance: u64,
+        timestamp: u64,
+    }
+
+    #[event]
+    struct TierVarianceFlagged has drop, store {
+        room_id: u64,
+        juror: address,
+        contributor: address,
+        juror_tier: u8,
+        majority_tier: u8,
+        tier_distance: u8,
         timestamp: u64,
     }
 
@@ -163,6 +176,199 @@ module aptosroom::variance {
     public fun get_valid_scores(room_id: u64): vector<u64> {
         // This returns only revealed, non-flagged scores
         room::get_revealed_scores(room_id)
+    }
+
+    // ============================================================
+    // TIER-BASED VARIANCE DETECTION
+    // ============================================================
+
+    /// Detect tier variance for a specific contributor
+    /// A juror is flagged if their tier is 2 tiers away from majority
+    /// Returns list of flagged juror addresses for this contributor
+    public fun detect_tier_variance_for_contributor(
+        room_id: u64,
+        contributor: address,
+        jurors: vector<address>,
+        tiers: vector<u8>,
+    ): vector<address> {
+        let flagged = vector::empty<address>();
+        let len = vector::length(&tiers);
+        
+        // Need at least 2 tier votes to detect variance
+        if (len < 2) {
+            return flagged
+        };
+
+        // Find majority tier
+        let majority_tier = find_majority_tier(&tiers);
+
+        // Check each juror's tier against majority
+        let i = 0;
+        while (i < len) {
+            let tier = *vector::borrow(&tiers, i);
+            let tier_distance = tier_abs_diff(tier, majority_tier);
+            
+            // Flag if 2 or more tiers away from majority
+            if (tier_distance >= 2) {
+                let juror = *vector::borrow(&jurors, i);
+                vector::push_back(&mut flagged, juror);
+
+                // Emit event
+                event::emit(TierVarianceFlagged {
+                    room_id,
+                    juror,
+                    contributor,
+                    juror_tier: tier,
+                    majority_tier,
+                    tier_distance,
+                    timestamp: timestamp::now_seconds(),
+                });
+            };
+            i = i + 1;
+        };
+
+        flagged
+    }
+
+    /// Find majority tier from a vector of tier votes
+    /// Returns the tier with most votes (A=1, B=2, C=3)
+    public fun find_majority_tier(tiers: &vector<u8>): u8 {
+        let tier_a = constants::TIER_A();
+        let tier_b = constants::TIER_B();
+        let tier_c = constants::TIER_C();
+        
+        let count_a: u64 = 0;
+        let count_b: u64 = 0;
+        let count_c: u64 = 0;
+        
+        let len = vector::length(tiers);
+        let i = 0;
+        while (i < len) {
+            let tier = *vector::borrow(tiers, i);
+            if (tier == tier_a) {
+                count_a = count_a + 1;
+            } else if (tier == tier_b) {
+                count_b = count_b + 1;
+            } else {
+                count_c = count_c + 1;
+            };
+            i = i + 1;
+        };
+
+        // Return tier with highest count (ties favor higher tier: A > B > C)
+        if (count_a >= count_b && count_a >= count_c) {
+            tier_a
+        } else if (count_b >= count_c) {
+            tier_b
+        } else {
+            tier_c
+        }
+    }
+
+    /// Absolute difference between two tier values (u8)
+    public fun tier_abs_diff(a: u8, b: u8): u8 {
+        if (a >= b) {
+            a - b
+        } else {
+            b - a
+        }
+    }
+
+    /// Process tier variance for all contributors in a room
+    /// Returns total number of variance flags issued
+    public fun process_tier_variance(room_id: u64): u64 {
+        let jury_pool = room::get_jury_pool(room_id);
+        let contributors = room::get_contributor_list(room_id);
+        let total_flags: u64 = 0;
+
+        // Build list of jurors who revealed tier votes
+        let revealed_jurors = vector::empty<address>();
+        let pool_len = vector::length(&jury_pool);
+        let i = 0;
+        while (i < pool_len) {
+            let juror = *vector::borrow(&jury_pool, i);
+            if (room::has_revealed_tier_vote(room_id, juror)) {
+                vector::push_back(&mut revealed_jurors, juror);
+            };
+            i = i + 1;
+        };
+
+        let juror_count = vector::length(&revealed_jurors);
+        if (juror_count < 2) {
+            return 0
+        };
+
+        // For each contributor, collect their tier assignments and check for variance
+        let contrib_len = vector::length(&contributors);
+        let c = 0;
+        while (c < contrib_len) {
+            let contributor = *vector::borrow(&contributors, c);
+            
+            // Get tier for this contributor from each revealed juror
+            let tiers = vector::empty<u8>();
+            let j = 0;
+            while (j < juror_count) {
+                let juror = *vector::borrow(&revealed_jurors, j);
+                let tier = get_tier_for_contributor(room_id, juror, contributor);
+                vector::push_back(&mut tiers, tier);
+                j = j + 1;
+            };
+
+            // Detect variance for this contributor
+            let flagged = detect_tier_variance_for_contributor(
+                room_id,
+                contributor,
+                revealed_jurors,
+                tiers
+            );
+            
+            // Update keycard variance flags for flagged jurors
+            let flagged_len = vector::length(&flagged);
+            let f = 0;
+            while (f < flagged_len) {
+                let juror = *vector::borrow(&flagged, f);
+                keycard::increment_variance_flags(juror);
+                total_flags = total_flags + 1;
+                f = f + 1;
+            };
+
+            c = c + 1;
+        };
+
+        total_flags
+    }
+
+    /// Get tier assigned by juror to contributor
+    /// Based on juror's tier_a and tier_b selections
+    fun get_tier_for_contributor(room_id: u64, juror: address, contributor: address): u8 {
+        let tier_a_selections = room::get_juror_tier_a_selections(room_id, juror);
+        let tier_b_selections = room::get_juror_tier_b_selections(room_id, juror);
+        
+        // Check if contributor is in tier A selections
+        if (vector_contains(&tier_a_selections, contributor)) {
+            return constants::TIER_A()
+        };
+        
+        // Check if contributor is in tier B selections
+        if (vector_contains(&tier_b_selections, contributor)) {
+            return constants::TIER_B()
+        };
+        
+        // Default to tier C
+        constants::TIER_C()
+    }
+
+    /// Check if vector contains an address
+    fun vector_contains(v: &vector<address>, target: address): bool {
+        let len = vector::length(v);
+        let i = 0;
+        while (i < len) {
+            if (*vector::borrow(v, i) == target) {
+                return true
+            };
+            i = i + 1;
+        };
+        false
     }
 
     // ============================================================

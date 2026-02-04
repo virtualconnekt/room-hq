@@ -126,6 +126,21 @@ module aptosroom::errors {
     /// Commit phase not complete
     public fun E_COMMIT_PHASE_NOT_COMPLETE(): u64 { 610 }
 
+    /// Invalid tier A selection count (must match required slots)
+    public fun E_INVALID_TIER_A_COUNT(): u64 { 611 }
+
+    /// Invalid tier B selection count (must match required slots)
+    public fun E_INVALID_TIER_B_COUNT(): u64 { 612 }
+
+    /// Duplicate contributor found in tier selections
+    public fun E_DUPLICATE_IN_TIERS(): u64 { 613 }
+
+    /// Selected address is not a valid contributor
+    public fun E_NOT_A_CONTRIBUTOR(): u64 { 614 }
+
+    /// Tier votes not yet computed
+    public fun E_TIERS_NOT_COMPUTED(): u64 { 615 }
+
     // ============================================================
     // SETTLEMENT ERRORS (700-799)
     // ============================================================

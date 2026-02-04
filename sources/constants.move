@@ -82,6 +82,77 @@ module aptosroom::constants {
     
     /// Client approval window duration: 3 days
     public fun APPROVAL_WINDOW_SECONDS(): u64 { 259200 }
+
+    // ============================================================
+    // TIER SYSTEM PARAMETERS
+    // ============================================================
+
+    /// Tier identifiers
+    public fun TIER_A(): u8 { 1 }
+    public fun TIER_B(): u8 { 2 }
+    public fun TIER_C(): u8 { 3 }
+
+    /// Tier jury scores (added to 60% client score)
+    /// Tier A: Excellent - top performers
+    public fun TIER_A_SCORE(): u64 { 40 }
+    /// Tier B: Good - above average
+    public fun TIER_B_SCORE(): u64 { 30 }
+    /// Tier C: General - default tier
+    public fun TIER_C_SCORE(): u64 { 20 }
+
+    /// Slot thresholds for tier allocation
+    public fun SLOT_THRESHOLD_LOW(): u64 { 10 }
+    public fun SLOT_THRESHOLD_HIGH(): u64 { 20 }
+
+    /// Tier A slots by contributor count
+    /// < 10 contributors: 1 slot
+    public fun TIER_A_SLOTS_LOW(): u64 { 1 }
+    /// 10-20 contributors: 3 slots
+    public fun TIER_A_SLOTS_MID(): u64 { 3 }
+    /// > 20 contributors: 5 slots
+    public fun TIER_A_SLOTS_HIGH(): u64 { 5 }
+
+    /// Tier B slots by contributor count
+    /// < 10 contributors: 2 slots
+    public fun TIER_B_SLOTS_LOW(): u64 { 2 }
+    /// 10-20 contributors: 4 slots
+    public fun TIER_B_SLOTS_MID(): u64 { 4 }
+    /// > 20 contributors: 7 slots
+    public fun TIER_B_SLOTS_HIGH(): u64 { 7 }
+
+    /// Get Tier A slots based on contributor count
+    public fun get_tier_a_slots(contributor_count: u64): u64 {
+        if (contributor_count < SLOT_THRESHOLD_LOW()) {
+            TIER_A_SLOTS_LOW()
+        } else if (contributor_count <= SLOT_THRESHOLD_HIGH()) {
+            TIER_A_SLOTS_MID()
+        } else {
+            TIER_A_SLOTS_HIGH()
+        }
+    }
+
+    /// Get Tier B slots based on contributor count
+    public fun get_tier_b_slots(contributor_count: u64): u64 {
+        if (contributor_count < SLOT_THRESHOLD_LOW()) {
+            TIER_B_SLOTS_LOW()
+        } else if (contributor_count <= SLOT_THRESHOLD_HIGH()) {
+            TIER_B_SLOTS_MID()
+        } else {
+            TIER_B_SLOTS_HIGH()
+        }
+    }
+
+    /// Convert tier to jury score
+    public fun tier_to_score(tier: u8): u64 {
+        if (tier == TIER_A()) {
+            TIER_A_SCORE()
+        } else if (tier == TIER_B()) {
+            TIER_B_SCORE()
+        } else {
+            TIER_C_SCORE()
+        }
+    }
+
     // ============================================================
     // TESTS
     // ============================================================
@@ -104,5 +175,40 @@ module aptosroom::constants {
     #[test]
     fun test_variance_threshold_is_15() {
         assert!(VARIANCE_THRESHOLD() == 15, 0);
+    }
+
+    #[test]
+    fun test_tier_scores() {
+        assert!(TIER_A_SCORE() == 40, 0);
+        assert!(TIER_B_SCORE() == 30, 0);
+        assert!(TIER_C_SCORE() == 20, 0);
+    }
+
+    #[test]
+    fun test_tier_slots_low() {
+        // < 10 contributors
+        assert!(get_tier_a_slots(5) == 1, 0);
+        assert!(get_tier_b_slots(5) == 2, 0);
+    }
+
+    #[test]
+    fun test_tier_slots_mid() {
+        // 10-20 contributors
+        assert!(get_tier_a_slots(15) == 3, 0);
+        assert!(get_tier_b_slots(15) == 4, 0);
+    }
+
+    #[test]
+    fun test_tier_slots_high() {
+        // > 20 contributors
+        assert!(get_tier_a_slots(25) == 5, 0);
+        assert!(get_tier_b_slots(25) == 7, 0);
+    }
+
+    #[test]
+    fun test_tier_to_score() {
+        assert!(tier_to_score(TIER_A()) == 40, 0);
+        assert!(tier_to_score(TIER_B()) == 30, 0);
+        assert!(tier_to_score(TIER_C()) == 20, 0);
     }
 }
