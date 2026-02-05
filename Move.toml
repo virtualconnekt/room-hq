@@ -1,10 +1,10 @@
 [package]
 name = "aptosroom-protocol"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["AptosRoom Team"]
 
 [addresses]
-aptosroom = "0x34a1f012718433e11b3515330d2d65093a13ffccc6b31883f490d653382eedcc"
+aptosroom = "0x73b46b42953dbe67a69830d235355e30dc3e10b6f9a1101ce79f63c2b878de5b"
 
 [dependencies]
 AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework", rev = "mainnet" }

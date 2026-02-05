@@ -1,8 +1,8 @@
 # AptosRoom Protocol — Testnet Integration Test Plan
 
-**Version:** 1.0  
-**Date:** February 4, 2026  
-**Contract:** `0x34a1f012718433e11b3515330d2d65093a13ffccc6b31883f490d653382eedcc`  
+**Version:** 1.1  
+**Date:** February 5, 2026  
+**Contract:** `0x73b46b42953dbe67a69830d235355e30dc3e10b6f9a1101ce79f63c2b878de5b`  
 **Network:** Aptos Testnet
 
 ---
