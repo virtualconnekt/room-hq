@@ -3,7 +3,7 @@
  * Tests for keycard minting and view functions
  */
 import {
-  describe,
+  describeNetwork,
   it,
   expect,
   beforeAll,
@@ -15,7 +15,7 @@ import {
   Account,
 } from './setup.js';
 
-describe('Keycard Module', () => {
+describeNetwork('Keycard Module', () => {
   let client: AptosRoomClient;
   let testAccount: Account;
 

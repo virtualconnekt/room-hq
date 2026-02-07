@@ -3,7 +3,7 @@
  * Tests for settlement approval and execution
  */
 import {
-  describe,
+  describeNetwork,
   it,
   expect,
   beforeAll,
@@ -19,7 +19,7 @@ import {
 } from './setup.js';
 import { STATES } from '../src/constants.js';
 
-describe('Settlement Module', () => {
+describeNetwork('Settlement Module', () => {
   let client: AptosRoomClient;
   let clientAccount: Account;
   let contributor1: Account;
@@ -194,7 +194,7 @@ describe('Settlement Module', () => {
   });
 });
 
-describe('Tier Settlement', () => {
+describeNetwork('Tier Settlement', () => {
   let client: AptosRoomClient;
   let clientAccount: Account;
   let contributor1: Account;

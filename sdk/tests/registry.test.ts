@@ -3,7 +3,7 @@
  * Tests for juror registration and category management
  */
 import {
-  describe,
+  describeNetwork,
   it,
   expect,
   beforeAll,
@@ -15,7 +15,7 @@ import {
   Account,
 } from './setup.js';
 
-describe('Juror Registry Module', () => {
+describeNetwork('Juror Registry Module', () => {
   let client: AptosRoomClient;
   let testAccount: Account;
   const testCategory = 'development';

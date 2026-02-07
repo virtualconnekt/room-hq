@@ -9,15 +9,22 @@ import { HashUtils } from '../src/utils/hash.js';
 import { EncryptionUtils } from '../src/utils/encryption.js';
 
 // Test configuration
+// Set APTOS_NETWORK=LOCAL to use local node, or provide pre-funded private keys
 export const TEST_CONFIG = {
-  network: Network.TESTNET,
+  network: (process.env.APTOS_NETWORK === 'LOCAL' ? Network.LOCAL : 
+            process.env.APTOS_NETWORK === 'DEVNET' ? Network.DEVNET : Network.TESTNET),
   // Use the deployed contract address
-  moduleAddress: '0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455',
+  moduleAddress: process.env.MODULE_ADDRESS || '0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455',
   // Funding amount for test accounts (0.5 APT)
   fundingAmount: 50_000_000,
   // Timeout for transactions
   txTimeout: 30_000,
+  // Skip network tests if faucet unavailable
+  skipNetworkTests: process.env.SKIP_NETWORK_TESTS === 'true',
 };
+
+// Log test configuration
+console.log(`Test Config: network=${TEST_CONFIG.network}, skipNetwork=${TEST_CONFIG.skipNetworkTests}`);
 
 /**
  * Create a new test client
@@ -94,3 +101,10 @@ export { describe, it, expect, beforeAll, beforeEach };
 export { Account, Network };
 export { AptosRoomClient };
 export { HashUtils, EncryptionUtils };
+
+/**
+ * Conditionally skip network tests
+ */
+export const describeNetwork = TEST_CONFIG.skipNetworkTests 
+  ? describe.skip 
+  : describe;

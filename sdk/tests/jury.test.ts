@@ -4,6 +4,7 @@
  */
 import {
   describe,
+  describeNetwork,
   it,
   expect,
   beforeAll,
@@ -22,7 +23,7 @@ import {
 } from './setup.js';
 import { STATES } from '../src/constants.js';
 
-describe('Jury Module', () => {
+describeNetwork('Jury Module', () => {
   let client: AptosRoomClient;
   let clientAccount: Account;
   let contributor1: Account;

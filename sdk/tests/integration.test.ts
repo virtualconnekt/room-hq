@@ -3,7 +3,7 @@
  * Full end-to-end workflow tests
  */
 import {
-  describe,
+  describeNetwork,
   it,
   expect,
   beforeAll,
@@ -19,7 +19,7 @@ import {
 } from './setup.js';
 import { STATES } from '../src/constants.js';
 
-describe('Full Workflow Integration', () => {
+describeNetwork('Full Workflow Integration', () => {
   let client: AptosRoomClient;
   
   // Participants

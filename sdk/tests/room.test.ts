@@ -3,7 +3,7 @@
  * Tests for room creation, submissions, and state management
  */
 import {
-  describe,
+  describeNetwork,
   it,
   expect,
   beforeAll,
@@ -18,7 +18,7 @@ import {
 } from './setup.js';
 import { STATES } from '../src/constants.js';
 
-describe('Room Module', () => {
+describeNetwork('Room Module', () => {
   let client: AptosRoomClient;
   let clientAccount: Account; // Room creator
   let contributorAccount: Account;
