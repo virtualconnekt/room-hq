@@ -141,6 +141,9 @@ module aptosroom::errors {
     /// Tier votes not yet computed
     public fun E_TIERS_NOT_COMPUTED(): u64 { 615 }
 
+    /// Encrypted data exceeds maximum allowed size
+    public fun E_ENCRYPTED_DATA_TOO_LARGE(): u64 { 616 }
+
     // ============================================================
     // SETTLEMENT ERRORS (700-799)
     // ============================================================

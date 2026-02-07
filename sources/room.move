@@ -118,6 +118,8 @@ module aptosroom::room {
         juror: address,
         /// Committed hash: SHA3(tier_a_addresses || tier_b_addresses || salt)
         commit_hash: vector<u8>,
+        /// Encrypted vote data (for cross-device recovery)
+        encrypted_data: vector<u8>,
         /// Addresses promoted to Tier A (revealed)
         tier_a_selections: vector<address>,
         /// Addresses promoted to Tier B (revealed)
@@ -829,11 +831,12 @@ module aptosroom::room {
     // TIER VOTE FUNCTIONS (for jury module)
     // ============================================================
 
-    /// Add tier vote commit (called by jury module)
+    /// Add tier vote commit with encrypted data (called by jury module)
     public(friend) fun add_tier_vote_commit(
         room_id: u64,
         juror: address,
         commit_hash: vector<u8>,
+        encrypted_data: vector<u8>,
     ) acquires RoomRegistry, Room {
         let registry = borrow_global<RoomRegistry>(@aptosroom);
         let room_owner = *table::borrow(&registry.rooms, room_id);
@@ -842,6 +845,7 @@ module aptosroom::room {
         let tier_vote = TierVote {
             juror,
             commit_hash,
+            encrypted_data,
             tier_a_selections: vector::empty<address>(),
             tier_b_selections: vector::empty<address>(),
             salt: vector::empty<u8>(),
@@ -881,6 +885,15 @@ module aptosroom::room {
         let room = borrow_global<Room>(room_owner);
         let tier_vote = table::borrow(&room.tier_votes, juror);
         tier_vote.commit_hash
+    }
+
+    /// Get encrypted tier vote data for recovery
+    public fun get_tier_vote_encrypted_data(room_id: u64, juror: address): vector<u8> acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        let tier_vote = table::borrow(&room.tier_votes, juror);
+        tier_vote.encrypted_data
     }
 
     /// Mark tier vote as revealed (called by jury module)

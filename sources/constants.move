@@ -84,6 +84,13 @@ module aptosroom::constants {
     public fun APPROVAL_WINDOW_SECONDS(): u64 { 259200 }
 
     // ============================================================
+    // ENCRYPTED COMMIT PARAMETERS
+    // ============================================================
+
+    /// Maximum size for encrypted vote data (1KB)
+    public fun MAX_ENCRYPTED_DATA_SIZE(): u64 { 1024 }
+
+    // ============================================================
     // TIER SYSTEM PARAMETERS
     // ============================================================
 

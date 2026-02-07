@@ -247,12 +247,14 @@ module aptosroom::jury {
     // TIER-BASED COMMIT/REVEAL PHASE
     // ============================================================
 
-    /// Commit tier vote (hash of tier selections)
+    /// Commit tier vote with encrypted recovery data
     /// Juror commits hash of tier_a_addresses || tier_b_addresses || salt
+    /// Encrypted data allows cross-device recovery during reveal
     public entry fun commit_tier_vote(
         account: &signer,
         room_id: u64,
         commit_hash: vector<u8>,
+        encrypted_data: vector<u8>,
     ) {
         let juror = signer::address_of(account);
 
@@ -266,8 +268,14 @@ module aptosroom::jury {
         // Assert juror has not already committed
         assert!(!room::has_committed_tier_vote(room_id, juror), errors::E_ALREADY_COMMITTED());
 
-        // Add tier vote commit to room
-        room::add_tier_vote_commit(room_id, juror, commit_hash);
+        // Validate encrypted data size
+        assert!(
+            vector::length(&encrypted_data) <= constants::MAX_ENCRYPTED_DATA_SIZE(),
+            errors::E_ENCRYPTED_DATA_TOO_LARGE()
+        );
+
+        // Add tier vote commit to room with encrypted data
+        room::add_tier_vote_commit(room_id, juror, commit_hash, encrypted_data);
 
         // Emit event
         event::emit(TierVoteCommitted {
@@ -546,6 +554,13 @@ module aptosroom::jury {
     /// Get tier reveal count for view
     public fun view_tier_reveal_count(room_id: u64): u64 {
         get_tier_reveal_count(room_id)
+    }
+
+    #[view]
+    /// Get encrypted tier vote data for recovery during reveal
+    /// Allows cross-device reveal by fetching encrypted data from chain
+    public fun get_tier_vote_encrypted(room_id: u64, juror: address): vector<u8> {
+        room::get_tier_vote_encrypted_data(room_id, juror)
     }
 
     // ============================================================

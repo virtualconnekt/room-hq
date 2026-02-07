@@ -89,6 +89,11 @@ module aptosroom::tier_tests {
         vector[1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8]
     }
 
+    /// Create test encrypted data (empty for tests)
+    fun test_encrypted_data(): vector<u8> {
+        vector::empty<u8>()
+    }
+
     // ============================================================
     // TIER SLOT ALLOCATION TESTS
     // ============================================================
@@ -161,7 +166,7 @@ module aptosroom::tier_tests {
         let commit_hash = jury::test_compute_tier_commit_hash(tier_a, tier_b, test_salt());
 
         // Commit tier vote
-        jury::commit_tier_vote(juror, room_id, commit_hash);
+        jury::commit_tier_vote(juror, room_id, commit_hash, test_encrypted_data());
 
         // Verify committed
         assert!(room::has_committed_tier_vote(room_id, juror_addr), 0);
@@ -190,10 +195,10 @@ module aptosroom::tier_tests {
         let commit_hash = jury::test_compute_tier_commit_hash(tier_a, tier_b, test_salt());
 
         // First commit
-        jury::commit_tier_vote(juror, room_id, commit_hash);
+        jury::commit_tier_vote(juror, room_id, commit_hash, test_encrypted_data());
         
         // Second commit should fail
-        jury::commit_tier_vote(juror, room_id, commit_hash);
+        jury::commit_tier_vote(juror, room_id, commit_hash, test_encrypted_data());
     }
 
     // ============================================================
@@ -222,7 +227,7 @@ module aptosroom::tier_tests {
         let commit_hash = jury::test_compute_tier_commit_hash(tier_a, tier_b, test_salt());
 
         // Commit
-        jury::commit_tier_vote(juror, room_id, commit_hash);
+        jury::commit_tier_vote(juror, room_id, commit_hash, test_encrypted_data());
 
         // Transition to reveal phase
         room::test_set_state(room_id, constants::STATE_JURY_REVEAL());
@@ -263,7 +268,7 @@ module aptosroom::tier_tests {
         let tier_b = vector[@0x103, @0x104];
         let commit_hash = jury::test_compute_tier_commit_hash(tier_a, tier_b, test_salt());
 
-        jury::commit_tier_vote(juror, room_id, commit_hash);
+        jury::commit_tier_vote(juror, room_id, commit_hash, test_encrypted_data());
         room::test_set_state(room_id, constants::STATE_JURY_REVEAL());
 
         // Should fail with E_INVALID_TIER_A_COUNT
@@ -293,7 +298,7 @@ module aptosroom::tier_tests {
         let tier_b = vector[@0x102];
         let commit_hash = jury::test_compute_tier_commit_hash(tier_a, tier_b, test_salt());
 
-        jury::commit_tier_vote(juror, room_id, commit_hash);
+        jury::commit_tier_vote(juror, room_id, commit_hash, test_encrypted_data());
         room::test_set_state(room_id, constants::STATE_JURY_REVEAL());
 
         // Should fail with E_INVALID_TIER_B_COUNT
@@ -323,7 +328,7 @@ module aptosroom::tier_tests {
         let tier_b = vector[@0x101, @0x102];
         let commit_hash = jury::test_compute_tier_commit_hash(tier_a, tier_b, test_salt());
 
-        jury::commit_tier_vote(juror, room_id, commit_hash);
+        jury::commit_tier_vote(juror, room_id, commit_hash, test_encrypted_data());
         room::test_set_state(room_id, constants::STATE_JURY_REVEAL());
 
         // Should fail with E_DUPLICATE_IN_TIERS
@@ -353,7 +358,7 @@ module aptosroom::tier_tests {
         let tier_b = vector[@0x102, @0x103];
         let commit_hash = jury::test_compute_tier_commit_hash(tier_a, tier_b, test_salt());
 
-        jury::commit_tier_vote(juror, room_id, commit_hash);
+        jury::commit_tier_vote(juror, room_id, commit_hash, test_encrypted_data());
         room::test_set_state(room_id, constants::STATE_JURY_REVEAL());
 
         // Should fail with E_NOT_A_CONTRIBUTOR
@@ -383,7 +388,7 @@ module aptosroom::tier_tests {
         let tier_b = vector[@0x102, @0x103];
         let commit_hash = jury::test_compute_tier_commit_hash(tier_a, tier_b, test_salt());
 
-        jury::commit_tier_vote(juror, room_id, commit_hash);
+        jury::commit_tier_vote(juror, room_id, commit_hash, test_encrypted_data());
         room::test_set_state(room_id, constants::STATE_JURY_REVEAL());
 
         // Reveal with different set - should fail
