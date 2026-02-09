@@ -1,46 +1,96 @@
 /**
- * Hash utilities for commit-reveal
- * Using Web Crypto API for SHA3-256 equivalent
- */
-
-/**
  * Simple SHA3-256 implementation using keccak
  * Note: For production, use a proper SHA3 library
  */
 export class HashUtils {
   /**
    * Compute SHA3-256 hash of tier vote data
-   * Format: sort(tierA) || sort(tierB) || salt
+   * Must match Move's jury::compute_tier_commit_hash()
+   * Format: BCS(tierA) || BCS(tierB) || salt
+   * 
+   * Move's BCS serialization for vector<address>:
+   * - ULEB128 length prefix (for small arrays, this is just the length byte)
+   * - Each address as 32 bytes
    */
   static computeTierVoteHash(
     tierA: string[],
     tierB: string[],
     salt: Uint8Array
   ): Uint8Array {
-    // Sort addresses for deterministic ordering
-    const sortedTierA = [...tierA].sort();
-    const sortedTierB = [...tierB].sort();
+    // Serialize tierA as BCS vector<address>
+    const tierABytes = this.serializeAddressVector(tierA);
 
-    // Create preimage: tierA addresses + tierB addresses + salt
-    const encoder = new TextEncoder();
-    const tierABytes = encoder.encode(sortedTierA.join(','));
-    const tierBBytes = encoder.encode(sortedTierB.join(','));
+    // Serialize tierB as BCS vector<address>
+    const tierBBytes = this.serializeAddressVector(tierB);
 
-    // Concatenate all parts
-    const preimage = new Uint8Array(tierABytes.length + 1 + tierBBytes.length + 1 + salt.length);
+    // Concatenate: tierA_bcs || tierB_bcs || salt
+    const data = new Uint8Array(tierABytes.length + tierBBytes.length + salt.length);
     let offset = 0;
-    
-    preimage.set(tierABytes, offset);
-    offset += tierABytes.length;
-    preimage[offset++] = 0x00; // separator
-    
-    preimage.set(tierBBytes, offset);
-    offset += tierBBytes.length;
-    preimage[offset++] = 0x00; // separator
-    
-    preimage.set(salt, offset);
 
-    return this.sha3_256(preimage);
+    data.set(tierABytes, offset);
+    offset += tierABytes.length;
+
+    data.set(tierBBytes, offset);
+    offset += tierBBytes.length;
+
+    data.set(salt, offset);
+
+    return this.sha3_256(data);
+  }
+
+  /**
+   * Serialize a vector of addresses in BCS format
+   * Matches Move's bcs::to_bytes(&vector<address>)
+   */
+  static serializeAddressVector(addresses: string[]): Uint8Array {
+    // ULEB128 encode the length (for lengths < 128, it's just the byte)
+    const lengthBytes = this.encodeULEB128(addresses.length);
+
+    // Each address is 32 bytes
+    const addressesBytes = new Uint8Array(addresses.length * 32);
+    for (let i = 0; i < addresses.length; i++) {
+      const addrBytes = this.addressToBytes(addresses[i]);
+      addressesBytes.set(addrBytes, i * 32);
+    }
+
+    // Combine length + addresses
+    const result = new Uint8Array(lengthBytes.length + addressesBytes.length);
+    result.set(lengthBytes, 0);
+    result.set(addressesBytes, lengthBytes.length);
+
+    return result;
+  }
+
+  /**
+   * Convert address string to 32-byte array
+   */
+  static addressToBytes(address: string): Uint8Array {
+    let cleanAddr = address.startsWith('0x') ? address.slice(2) : address;
+    // Pad to 64 hex chars (32 bytes)
+    cleanAddr = cleanAddr.padStart(64, '0');
+
+    const bytes = new Uint8Array(32);
+    for (let i = 0; i < 32; i++) {
+      bytes[i] = parseInt(cleanAddr.substr(i * 2, 2), 16);
+    }
+    return bytes;
+  }
+
+  /**
+   * Encode number as ULEB128 (unsigned LEB128)
+   * For small numbers < 128, this is just the byte
+   */
+  static encodeULEB128(value: number): Uint8Array {
+    const result: number[] = [];
+    do {
+      let byte = value & 0x7f;
+      value >>>= 7;
+      if (value !== 0) {
+        byte |= 0x80;
+      }
+      result.push(byte);
+    } while (value !== 0);
+    return new Uint8Array(result);
   }
 
   /**

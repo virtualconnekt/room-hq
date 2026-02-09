@@ -33,12 +33,14 @@ export interface CommitTierVoteParams {
 
 export interface RevealTierVoteParams {
   roomId: number;
-  orderedContributors: string[];
+  tierA: string[];  // Addresses selected for Tier A
+  tierB: string[];  // Addresses selected for Tier B
   salt: Uint8Array;
 }
 
 export interface TierVoteData {
-  orderedContributors: string[];
+  tierA: string[];
+  tierB: string[];
   salt: Uint8Array;
 }
 
@@ -46,7 +48,7 @@ export class JuryClient {
   constructor(
     private readonly aptos: Aptos,
     private readonly moduleAddress: string
-  ) {}
+  ) { }
 
   // ============================================================
   // HELPER FUNCTIONS
@@ -60,52 +62,44 @@ export class JuryClient {
   }
 
   /**
-   * Compute vote hash for tier voting (ordered list format)
-   * This hashes the ordered contributors list with the salt
+   * Compute vote hash for tier voting (tierA/tierB format)
+   * Must match jury.move::compute_tier_commit_hash()
+   * Format: BCS(tierA) || BCS(tierB) || salt
    */
-  computeTierVoteHash(orderedContributors: string[], salt: Uint8Array): Uint8Array {
-    // For tier voting, we use the ordered contributors as they come (no tierA/tierB split)
-    // Hash format: contributors[0] || contributors[1] || ... || salt
-    const encoder = new TextEncoder();
-    const contributorBytes = encoder.encode(orderedContributors.join(','));
-    
-    const preimage = new Uint8Array(contributorBytes.length + 1 + salt.length);
-    preimage.set(contributorBytes, 0);
-    preimage[contributorBytes.length] = 0x00;
-    preimage.set(salt, contributorBytes.length + 1);
-    
-    return HashUtils.sha3_256(preimage);
+  computeTierVoteHash(tierA: string[], tierB: string[], salt: Uint8Array): Uint8Array {
+    return HashUtils.computeTierVoteHash(tierA, tierB, salt);
   }
 
   /**
    * Encrypt tier vote data for on-chain storage
    * Uses the juror's Ed25519 public key for encryption
+   * TierVoteData now contains tierA and tierB arrays
    */
   encryptTierVote(
     voteData: TierVoteData,
     jurorEd25519PublicKey: Uint8Array
   ): Uint8Array {
-    // Serialize vote data  
+    // Serialize vote data (now with tierA/tierB)
     const plaintext = new TextEncoder().encode(JSON.stringify(voteData));
-    
+
     // Generate ephemeral keypair
     const ephemeralKeyPair = nacl.box.keyPair();
-    
+
     // Convert Ed25519 to X25519
     const recipientX25519Key = EncryptionUtils.ed25519ToX25519PublicKey(jurorEd25519PublicKey);
-    
+
     // Generate nonce
     const nonce = nacl.randomBytes(nacl.box.nonceLength);
-    
+
     // Encrypt with NaCl box
     const ciphertext = nacl.box(plaintext, nonce, recipientX25519Key, ephemeralKeyPair.secretKey);
-    
+
     // Package: ephemeral public key (32) + nonce (24) + ciphertext
     const result = new Uint8Array(32 + 24 + ciphertext.length);
     result.set(ephemeralKeyPair.publicKey, 0);
     result.set(nonce, 32);
     result.set(ciphertext, 56);
-    
+
     return result;
   }
 
@@ -217,6 +211,7 @@ export class JuryClient {
 
   /**
    * Reveal a tier vote
+   * Provides tier_a and tier_b selections to the contract
    */
   async revealTierVote(
     account: Account,
@@ -226,7 +221,8 @@ export class JuryClient {
       function: `${this.moduleAddress}::jury::reveal_tier_vote`,
       functionArguments: [
         BigInt(params.roomId),
-        params.orderedContributors,
+        params.tierA,
+        params.tierB,
         Array.from(params.salt),
       ],
     };
