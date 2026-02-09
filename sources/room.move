@@ -1183,4 +1183,27 @@ module aptosroom::room {
         let room = borrow_global_mut<Room>(room_owner);
         room.tiers_computed = true;
     }
+
+    #[test_only]
+    /// Test helper to set client score for a contributor (creates submission if needed)
+    public fun test_set_client_score(room_id: u64, contributor: address, score: u64) acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+        
+        if (!table::contains(&room.submissions, contributor)) {
+            // Create a test submission
+            let submission = Submission {
+                contributor,
+                data_hash: vector::empty<u8>(),
+                submitted_at: 0,
+                client_score: option::some(score),
+            };
+            table::add(&mut room.submissions, contributor, submission);
+        } else {
+            let submission = table::borrow_mut(&mut room.submissions, contributor);
+            submission.client_score = option::some(score);
+        };
+    }
 }
+

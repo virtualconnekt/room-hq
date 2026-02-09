@@ -13,8 +13,12 @@ import { EncryptionUtils } from '../src/utils/encryption.js';
 export const TEST_CONFIG = {
   network: (process.env.APTOS_NETWORK === 'LOCAL' ? Network.LOCAL : 
             process.env.APTOS_NETWORK === 'DEVNET' ? Network.DEVNET : Network.TESTNET),
-  // Use the deployed contract address
-  moduleAddress: process.env.MODULE_ADDRESS || '0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455',
+  // Use the deployed contract address (devnet or testnet)
+  moduleAddress: process.env.MODULE_ADDRESS || (
+    process.env.APTOS_NETWORK === 'DEVNET' 
+      ? '0x73b46b42953dbe67a69830d235355e30dc3e10b6f9a1101ce79f63c2b878de5b'
+      : '0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455'
+  ),
   // Funding amount for test accounts (0.5 APT)
   fundingAmount: 50_000_000,
   // Timeout for transactions
