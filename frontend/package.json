@@ -1,0 +1,39 @@
+{
+  "name": "aptosroom-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@aptos-labs/gas-station-client": "^2.0.3",
+    "@aptos-labs/ts-sdk": "^1.26.0",
+    "@aptos-labs/wallet-adapter-core": "^4.22.0",
+    "@aptos-labs/wallet-adapter-react": "^3.7.0",
+    "@aptosroom/sdk": "file:../sdk",
+    "browserify-zlib": "^0.2.0",
+    "buffer": "^6.0.3",
+    "https-browserify": "^1.0.0",
+    "next": "14.2.21",
+    "petra-plugin-wallet-adapter": "^0.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "url": "^0.11.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.21",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5"
+  }
+}

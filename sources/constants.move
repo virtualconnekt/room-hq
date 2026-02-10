@@ -129,7 +129,9 @@ module aptosroom::constants {
 
     /// Get Tier A slots based on contributor count
     public fun get_tier_a_slots(contributor_count: u64): u64 {
-        if (contributor_count < SLOT_THRESHOLD_LOW()) {
+        if (contributor_count <= 2) {
+            1
+        } else if (contributor_count < SLOT_THRESHOLD_LOW()) {
             TIER_A_SLOTS_LOW()
         } else if (contributor_count <= SLOT_THRESHOLD_HIGH()) {
             TIER_A_SLOTS_MID()
@@ -140,7 +142,11 @@ module aptosroom::constants {
 
     /// Get Tier B slots based on contributor count
     public fun get_tier_b_slots(contributor_count: u64): u64 {
-        if (contributor_count < SLOT_THRESHOLD_LOW()) {
+        if (contributor_count == 1) {
+            0
+        } else if (contributor_count == 2) {
+            1
+        } else if (contributor_count < SLOT_THRESHOLD_LOW()) {
             TIER_B_SLOTS_LOW()
         } else if (contributor_count <= SLOT_THRESHOLD_HIGH()) {
             TIER_B_SLOTS_MID()

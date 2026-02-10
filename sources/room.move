@@ -21,6 +21,8 @@ module aptosroom::room {
     use aptosroom::constants;
     use aptosroom::keycard;
     use aptosroom::vault;
+    use std::bcs;
+    use std::hash;
 
     // Friend declarations
     friend aptosroom::jury;
@@ -211,7 +213,7 @@ module aptosroom::room {
         let len = vector::length(&room.jury_pool);
         while (i < len) {
             let juror = *vector::borrow(&room.jury_pool, i);
-            if (table::contains(&room.votes, juror)) {
+            if (table::contains(&room.tier_votes, juror)) {
                 count = count + 1;
             };
             i = i + 1;
@@ -393,6 +395,76 @@ module aptosroom::room {
 
         // Update state
         room.state = to_state;
+
+        // Emit event
+        event::emit(RoomStateChanged {
+            room_id,
+            from_state,
+            to_state,
+            timestamp: timestamp::now_seconds(),
+        });
+    }
+
+    /// Close room and auto-select jury (OPEN -> CLOSED)
+    public entry fun close_room_with_jury(
+        account: &signer,
+        room_id: u64,
+        eligible_jurors: vector<address>,
+        jury_size: u64,
+    ) acquires RoomRegistry, Room {
+        let caller = signer::address_of(account);
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+
+        // Allow client to close early, or anyone after deadline
+        let is_client = room.client == caller;
+        let past_deadline = timestamp::now_seconds() >= room.deadline_submit;
+        assert!(is_client || past_deadline, errors::E_NOT_CLIENT());
+
+        // Assert valid transition
+        let from_state = room.state;
+        let to_state = constants::STATE_CLOSED();
+        assert!(is_valid_transition(from_state, to_state), errors::E_INVALID_STATE_TRANSITION());
+
+        // Update state
+        room.state = to_state;
+
+        // Auto-select jury: validate enough eligible jurors
+        let len = vector::length(&eligible_jurors);
+        assert!(len >= jury_size, errors::E_INSUFFICIENT_JURORS());
+
+        // Simple deterministic selection: take first jury_size from shuffled list
+        let mut_jurors = eligible_jurors;
+        // Fisher-Yates shuffle with room_id as seed
+        let n = vector::length(&mut_jurors);
+        if (n > 1) {
+            let i = n - 1;
+            while (i > 0) {
+                let combined = room_id * 1000000 + i;
+                let bytes = bcs::to_bytes(&combined);
+                let hash_bytes = hash::sha3_256(bytes);
+                let value: u64 = 0;
+                let k = 0;
+                while (k < 8) {
+                    value = (value << 8) | (*vector::borrow(&hash_bytes, k) as u64);
+                    k = k + 1;
+                };
+                let j = value % (i + 1);
+                vector::swap(&mut mut_jurors, i, j);
+                i = i - 1;
+            };
+        };
+
+        // Take first jury_size elements
+        let selected = vector::empty<address>();
+        let i = 0;
+        while (i < jury_size) {
+            vector::push_back(&mut selected, *vector::borrow(&mut_jurors, i));
+            i = i + 1;
+        };
+
+        room.jury_pool = selected;
 
         // Emit event
         event::emit(RoomStateChanged {

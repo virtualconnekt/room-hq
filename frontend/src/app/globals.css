@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --accent: #00d4ff;
+  --accent-hover: #00a8cc;
+  --card-bg: #111111;
+  --card-border: #222222;
+  --success: #22c55e;
+  --warning: #eab308;
+  --error: #ef4444;
+
+  /* State colors */
+  --state-init: #6b7280;
+  --state-open: #22c55e;
+  --state-closed: #eab308;
+  --state-jury: #3b82f6;
+  --state-finalized: #a855f7;
+  --state-settled: #ffffff;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  min-height: 100vh;
+}
+
+/* Card styles */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* Button styles */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.btn-secondary:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* State badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-init {
+  background: var(--state-init);
+  color: #fff;
+}
+
+.badge-open {
+  background: var(--state-open);
+  color: #000;
+}
+
+.badge-closed {
+  background: var(--state-closed);
+  color: #000;
+}
+
+.badge-jury {
+  background: var(--state-jury);
+  color: #fff;
+}
+
+.badge-finalized {
+  background: var(--state-finalized);
+  color: #fff;
+}
+
+.badge-settled {
+  background: var(--state-settled);
+  color: #000;
+}
+
+/* Input styles */
+input,
+textarea,
+select {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--foreground);
+  width: 100%;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}

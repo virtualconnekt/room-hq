@@ -20,17 +20,18 @@ describe('Hash Utilities', () => {
       expect(hash1.length).toBe(32);
     });
 
-    it('should sort addresses in tier hash', () => {
+    it('should be order-sensitive (matches Move BCS serialization)', () => {
       const tierA1 = ['0x3', '0x1', '0x2'];
       const tierA2 = ['0x1', '0x2', '0x3'];
       const tierB = ['0x4'];
       const salt = new Uint8Array(32).fill(42);
 
-      // Should be the same because addresses are sorted
+      // Different order = different hash (BCS doesn't sort)
+      // This matches Move's bcs::to_bytes behavior
       const hash1 = HashUtils.computeTierVoteHash(tierA1, tierB, salt);
       const hash2 = HashUtils.computeTierVoteHash(tierA2, tierB, salt);
 
-      expect(hash1).toEqual(hash2);
+      expect(hash1).not.toEqual(hash2);
     });
 
     it('should produce different hashes for different tiers', () => {
@@ -113,7 +114,7 @@ describe('Encryption Utilities', () => {
     it('should convert Ed25519 key to X25519', () => {
       // Generate a test Ed25519 keypair (simplified for testing)
       const ed25519PublicKey = new Uint8Array(32).fill(1);
-      
+
       // This may throw if the key is invalid, which is expected behavior
       // for actual crypto operations
       try {
@@ -161,15 +162,15 @@ describe('Encryption Utilities', () => {
     it('should encrypt tier vote data', () => {
       const tierA = ['0x1', '0x2'];
       const tierB = ['0x3'];
-      
+
       // Generate a real Ed25519 keypair for testing
       const keypair = EncryptionUtils.generateEphemeralKeyPair();
-      
+
       // Note: This uses NaCl X25519 keys, not Ed25519
       // For full test, would need actual Ed25519 keys
       try {
         const result = EncryptionUtils.encryptTierVote(tierA, tierB, keypair.publicKey);
-        
+
         expect(result.commitHash.length).toBe(32);
         expect(result.encryptedData.length).toBeGreaterThan(56); // 32 + 24 + ciphertext
         expect(result.nonce.length).toBe(24);
@@ -185,10 +186,10 @@ describe('Encryption Utilities', () => {
       const participant = '0x1234';
       const score = 85;
       const keypair = EncryptionUtils.generateEphemeralKeyPair();
-      
+
       try {
         const result = EncryptionUtils.encryptVote(participant, score, keypair.publicKey);
-        
+
         expect(result.commitHash.length).toBe(32);
         expect(result.encryptedData.length).toBeGreaterThan(56);
       } catch (e) {
