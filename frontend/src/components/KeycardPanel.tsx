@@ -3,6 +3,7 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useEffect, useState, useCallback } from "react";
 import { keycardClient, aptos } from "@/lib/aptosroom";
+import { submitSponsoredTransaction } from "@/lib/sponsoredTransaction";
 
 interface KeycardData {
     hasKeycard: boolean;
@@ -14,7 +15,7 @@ interface KeycardData {
 }
 
 export function KeycardPanel() {
-    const { account, connected, signAndSubmitTransaction } = useWallet();
+    const { account, connected, signAndSubmitTransaction, signTransaction } = useWallet();
     const [keycard, setKeycard] = useState<KeycardData>({ hasKeycard: false });
     const [loading, setLoading] = useState(false);
     const [minting, setMinting] = useState(false);
@@ -71,11 +72,14 @@ export function KeycardPanel() {
         try {
             const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
-            const response = await signAndSubmitTransaction({
+            const response = await submitSponsoredTransaction({
+                accountAddress: account.address.toString(),
                 data: {
                     function: `${contractAddress}::keycard::mint`,
                     functionArguments: [],
                 },
+                signAndSubmitTransaction,
+                signTransaction,
             });
 
             // Wait for transaction confirmation

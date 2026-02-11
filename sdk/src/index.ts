@@ -13,6 +13,7 @@ export { JurorRegistryClient } from './modules/registry.js';
 export { RoomClient } from './modules/room.js';
 export { JuryClient } from './modules/jury.js';
 export { SettlementClient } from './modules/settlement.js';
+export { AggregationClient } from './modules/aggregation.js';
 
 // Types
 export * from './types/index.js';

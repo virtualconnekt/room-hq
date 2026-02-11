@@ -23,6 +23,7 @@ module aptosroom::room {
     use aptosroom::vault;
     use std::bcs;
     use std::hash;
+    use aptos_framework::account;
 
     // Friend declarations
     friend aptosroom::jury;
@@ -246,6 +247,19 @@ module aptosroom::room {
         let room_id = registry.next_id;
         registry.next_id = room_id + 1;
 
+        // Create resource account for the room to avoid collision
+        // Seed must be unique per user, and room_id is globally unique so it works
+        let seed = bcs::to_bytes(&room_id);
+        let (room_signer, room_signer_cap) = account::create_resource_account(account, seed);
+        let room_addr = signer::address_of(&room_signer);
+        // We drop the capability as we don't need the room to sign transactions later
+        // The room is just a storage container for now
+        // If needed in future, we could store the capability in the Room struct
+        // But that would require changing the struct definition
+        // For now, we trust the logic that only owner/admin can mutate via module functions
+        // which check assertions, not signatures of the resource account
+        let _ = room_signer_cap;
+
         // Withdraw coins for escrow
         let deposit = coin::withdraw<AptosCoin>(account, task_reward);
 
@@ -279,11 +293,11 @@ module aptosroom::room {
             created_at: timestamp::now_seconds(),
         };
 
-        // Store room at client's address
-        move_to(account, room);
+        // Store room at resource account address
+        move_to(&room_signer, room);
 
         // Add to registry
-        table::add(&mut registry.rooms, room_id, client);
+        table::add(&mut registry.rooms, room_id, room_addr);
 
         // Emit event
         event::emit(RoomCreated {
@@ -343,6 +357,9 @@ module aptosroom::room {
 
         // Assert room state == OPEN
         assert!(room.state == constants::STATE_OPEN(), errors::E_ROOM_NOT_OPEN());
+
+        // Assert client cannot submit
+        assert!(contributor != room.client, errors::E_CLIENT_CANNOT_SUBMIT());
 
         // Assert timestamp < deadline_submit
         assert!(

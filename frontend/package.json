@@ -10,20 +10,12 @@
   },
   "dependencies": {
     "@aptos-labs/gas-station-client": "^2.0.3",
-    "@aptos-labs/ts-sdk": "^1.26.0",
-    "@aptos-labs/wallet-adapter-core": "^4.22.0",
-    "@aptos-labs/wallet-adapter-react": "^3.7.0",
+    "@aptos-labs/ts-sdk": "^5.0.0",
+    "@aptos-labs/wallet-adapter-react": "^7.0.0",
     "@aptosroom/sdk": "file:../sdk",
-    "browserify-zlib": "^0.2.0",
-    "buffer": "^6.0.3",
-    "https-browserify": "^1.0.0",
     "next": "14.2.21",
-    "petra-plugin-wallet-adapter": "^0.4.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "stream-browserify": "^3.0.0",
-    "stream-http": "^3.2.0",
-    "url": "^0.11.4"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",

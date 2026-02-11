@@ -88,6 +88,9 @@ module aptosroom::errors {
     
     /// Submission not found
     public fun E_SUBMISSION_NOT_FOUND(): u64 { 502 }
+    
+    /// Client cannot submit entry to their own room
+    public fun E_CLIENT_CANNOT_SUBMIT(): u64 { 503 }
 
     // ============================================================
     // JURY / VOTING ERRORS (600-699)

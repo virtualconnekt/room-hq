@@ -1,46 +1,42 @@
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+import { GasStationClient, GasStationTransactionSubmitter } from "@aptos-labs/gas-station-client";
 import {
     KeycardClient,
     RoomClient,
     JuryClient,
     SettlementClient,
     JurorRegistryClient,
+    AggregationClient,
 } from "@aptosroom/sdk";
 
 // Contract address from environment
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 const NETWORK = (process.env.NEXT_PUBLIC_APTOS_NETWORK || "testnet") as "testnet" | "mainnet" | "devnet";
 
-// Gas Station Integration
-import { GasStationClient, GasStationTransactionSubmitter } from "@aptos-labs/gas-station-client";
+const network = NETWORK === "testnet" ? Network.TESTNET :
+    NETWORK === "mainnet" ? Network.MAINNET : Network.DEVNET;
 
-export let transactionSubmitter: GasStationTransactionSubmitter | undefined;
-
+// Gas Station setup
 const GAS_STATION_API_KEY = process.env.NEXT_PUBLIC_GAS_STATION_API_KEY;
 
-let pluginSettings = undefined;
+export let transactionSubmitter: GasStationTransactionSubmitter | undefined;
 
 if (GAS_STATION_API_KEY) {
     console.log("Initializing Gas Station Client...");
     const gasStationClient = new GasStationClient({
-        network: NETWORK === "testnet" ? Network.TESTNET :
-            NETWORK === "mainnet" ? Network.MAINNET : Network.DEVNET,
+        network,
         apiKey: GAS_STATION_API_KEY,
     });
     transactionSubmitter = new GasStationTransactionSubmitter(gasStationClient);
-    pluginSettings = {
-        TRANSACTION_SUBMITTER: transactionSubmitter,
-    };
-} else {
-    // console.warn("No Gas Station API Key found. Transactions will require user to pay gas.");
 }
 
-// Create Aptos client for the configured network
+// Create Aptos client (with Gas Station if configured)
 const config = new AptosConfig({
-    network: NETWORK === "testnet" ? Network.TESTNET :
-        NETWORK === "mainnet" ? Network.MAINNET : Network.DEVNET,
-    pluginSettings,
-} as any);
+    network,
+    pluginSettings: transactionSubmitter ? {
+        TRANSACTION_SUBMITTER: transactionSubmitter,
+    } : undefined,
+});
 
 export const aptos = new Aptos(config);
 
@@ -50,6 +46,7 @@ export const roomClient = new RoomClient(aptos, CONTRACT_ADDRESS);
 export const juryClient = new JuryClient(aptos, CONTRACT_ADDRESS);
 export const settlementClient = new SettlementClient(aptos, CONTRACT_ADDRESS);
 export const registryClient = new JurorRegistryClient(aptos, CONTRACT_ADDRESS);
+export const aggregationClient = new AggregationClient(aptos, CONTRACT_ADDRESS);
 
 export async function getNextRoomId(): Promise<number> {
     try {
@@ -59,13 +56,12 @@ export async function getNextRoomId(): Promise<number> {
             resourceType: `${CONTRACT_ADDRESS}::room::RoomRegistry`,
         });
         console.log("RoomRegistry resource:", resource);
-        // SDK usually returns { type: "...", data: { ... } }
         const data = (resource as any).data || resource;
         const nextId = Number(data.next_id);
 
         if (isNaN(nextId)) {
             console.warn("Parsed next_id is NaN", data);
-            return 50; // Fallback
+            return 50;
         }
 
         console.log("Parsed next_id:", nextId);
@@ -75,7 +71,6 @@ export async function getNextRoomId(): Promise<number> {
         return 50;
     }
 }
-
 
 // Room state constants (matching contract)
 export const ROOM_STATES = {

@@ -8,6 +8,7 @@ import {
     STATE_LABELS,
     STATE_BADGES,
 } from "@/lib/aptosroom";
+import { submitSponsoredTransaction } from "@/lib/sponsoredTransaction";
 import { TierVote } from "./TierVote";
 import { SettleRoom } from "./SettleRoom";
 
@@ -28,17 +29,17 @@ interface RoomData {
 }
 
 // Direct view function helpers (only using actual #[view] functions)
-async function viewFn(fnName: string, args: string[]): Promise<any[]> {
+async function viewFn(fnName: string, args: string[], moduleName = "room"): Promise<any[]> {
     return aptos.view({
         payload: {
-            function: `${CONTRACT_ADDRESS}::room::${fnName}`,
+            function: `${CONTRACT_ADDRESS}::${moduleName}::${fnName}` as `${string}::${string}::${string}`,
             functionArguments: args,
         },
     });
 }
 
 export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
-    const { account, connected, signAndSubmitTransaction } = useWallet();
+    const { account, connected, signAndSubmitTransaction, signTransaction } = useWallet();
     const [room, setRoom] = useState<RoomData | null>(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
@@ -88,11 +89,14 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
         try {
             const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
-            const response = await signAndSubmitTransaction({
+            const response = await submitSponsoredTransaction({
+                accountAddress: account.address.toString(),
                 data: {
                     function: `${contractAddress}::${functionName}` as `${string}::${string}::${string}`,
                     functionArguments: args as any,
                 },
+                signAndSubmitTransaction,
+                signTransaction,
             });
 
             await aptos.waitForTransaction({ transactionHash: response.hash });
@@ -115,7 +119,24 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
     };
     const handleStartJuryPhase = () => executeAction("room::start_jury_phase", [roomId]);
     const handleStartRevealPhase = () => executeAction("room::start_reveal_phase", [roomId]);
-    const handleFinalizeRoom = () => executeAction("room::finalize_room", [roomId]);
+    const handleFinalizeRoom = async () => {
+        // 1. Check if tiers are computed
+        try {
+            const [areTiersComputed] = await viewFn("are_tiers_computed", [roomId.toString()], "aggregation");
+
+            if (!areTiersComputed) {
+                // 2. Aggregate tier votes first
+                await executeAction("aggregation::aggregate_tier_votes", [roomId]);
+                // Need to wait? executeAction calls waitForTransaction
+            }
+
+            // 3. Finalize room
+            executeAction("room::finalize_room", [roomId]);
+        } catch (e) {
+            console.error("Error finalizing:", e);
+            setError("Failed to finalize room");
+        }
+    };
 
     const handleSubmitEntry = async () => {
         if (!submitHash.trim()) {

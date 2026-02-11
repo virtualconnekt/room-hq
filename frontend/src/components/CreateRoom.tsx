@@ -3,13 +3,14 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useState } from "react";
 import { aptos, parseApt, formatApt, keycardClient } from "@/lib/aptosroom";
+import { submitSponsoredTransaction } from "@/lib/sponsoredTransaction";
 
 interface CreateRoomProps {
     onRoomCreated: () => void;
 }
 
 export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
-    const { account, connected, signAndSubmitTransaction } = useWallet();
+    const { account, connected, signAndSubmitTransaction, signTransaction } = useWallet();
     const [isOpen, setIsOpen] = useState(false);
     const [creating, setCreating] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -107,8 +108,11 @@ export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
                 // If our manual simulation fails (e.g. key format), we just proceed to try the wallet's submission
             }
 
-            const response = await signAndSubmitTransaction({
+            const response = await submitSponsoredTransaction({
+                accountAddress: account.address.toString(),
                 data: payload as any,
+                signAndSubmitTransaction,
+                signTransaction,
             });
 
             // Wait for transaction confirmation
@@ -119,9 +123,11 @@ export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
             setTaskDescription("");
             setReward("1");
             onRoomCreated();
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error creating room:", err);
-            setError("Failed to create room. Make sure you have enough APT for the escrow.");
+            // Show detailed error for debugging
+            const errorMessage = err?.message || err?.toString() || "Unknown error";
+            setError(`Failed to create room: ${errorMessage}`);
         } finally {
             setCreating(false);
         }

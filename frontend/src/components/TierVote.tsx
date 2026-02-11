@@ -13,6 +13,7 @@ import {
     bytesToHex,
     hexToBytes,
 } from "@/lib/aptosroom";
+import { submitSponsoredTransaction } from "@/lib/sponsoredTransaction";
 
 interface TierVoteProps {
     roomId: number;
@@ -22,7 +23,7 @@ interface TierVoteProps {
 }
 
 export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = false }: TierVoteProps) {
-    const { account, connected, signAndSubmitTransaction } = useWallet();
+    const { account, connected, signAndSubmitTransaction, signTransaction } = useWallet();
     const [tierA, setTierA] = useState<Set<string>>(new Set());
     const [tierB, setTierB] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(false);
@@ -120,10 +121,25 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
 
             const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
-            // Empty encrypted data for simplicity
-            const encryptedData: number[] = [];
+            // Encrypt data for recovery (store on-chain)
+            let encryptedData: number[] = [];
+            if (account.publicKey) {
+                try {
+                    // account.publicKey is usually hex string
+                    const pubKeyBytes = hexToBytes(account.publicKey.toString());
+                    const encrypted = juryClient.encryptTierVote({
+                        tierA: tierAList,
+                        tierB: tierBList,
+                        salt: salt
+                    }, pubKeyBytes);
+                    encryptedData = Array.from(encrypted);
+                } catch (e) {
+                    console.warn("Failed to encrypt vote data, proceeding without on-chain backup:", e);
+                }
+            }
 
-            const response = await signAndSubmitTransaction({
+            const response = await submitSponsoredTransaction({
+                accountAddress: account.address.toString(),
                 data: {
                     function: `${contractAddress}::jury::commit_tier_vote`,
                     functionArguments: [
@@ -132,6 +148,8 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
                         encryptedData,
                     ],
                 },
+                signAndSubmitTransaction,
+                signTransaction,
             });
 
             await aptos.waitForTransaction({ transactionHash: response.hash });
@@ -161,7 +179,8 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
             const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
             const salt = hexToBytes(stored.salt);
 
-            const response = await signAndSubmitTransaction({
+            const response = await submitSponsoredTransaction({
+                accountAddress: account.address.toString(),
                 data: {
                     function: `${contractAddress}::jury::reveal_tier_vote`,
                     functionArguments: [
@@ -171,6 +190,8 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
                         Array.from(salt),
                     ],
                 },
+                signAndSubmitTransaction,
+                signTransaction,
             });
 
             await aptos.waitForTransaction({ transactionHash: response.hash });
@@ -257,10 +278,10 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
                     <label
                         key={`a-${addr}`}
                         className={`flex items-center gap-2 p-2 rounded border cursor-pointer transition-colors ${tierA.has(addr)
-                                ? "border-purple-500 bg-purple-500/10"
-                                : tierB.has(addr)
-                                    ? "border-gray-700 bg-gray-800 opacity-50"
-                                    : "border-gray-700 hover:border-gray-600"
+                            ? "border-purple-500 bg-purple-500/10"
+                            : tierB.has(addr)
+                                ? "border-gray-700 bg-gray-800 opacity-50"
+                                : "border-gray-700 hover:border-gray-600"
                             }`}
                     >
                         <input
@@ -284,10 +305,10 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
                     <label
                         key={`b-${addr}`}
                         className={`flex items-center gap-2 p-2 rounded border cursor-pointer transition-colors ${tierB.has(addr)
-                                ? "border-blue-500 bg-blue-500/10"
-                                : tierA.has(addr)
-                                    ? "border-gray-700 bg-gray-800 opacity-50"
-                                    : "border-gray-700 hover:border-gray-600"
+                            ? "border-blue-500 bg-blue-500/10"
+                            : tierA.has(addr)
+                                ? "border-gray-700 bg-gray-800 opacity-50"
+                                : "border-gray-700 hover:border-gray-600"
                             }`}
                     >
                         <input

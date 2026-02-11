@@ -6,6 +6,7 @@ import {
     aptos,
     roomClient,
 } from "@/lib/aptosroom";
+import { submitSponsoredTransaction } from "@/lib/sponsoredTransaction";
 
 interface SettleRoomProps {
     roomId: number;
@@ -14,7 +15,7 @@ interface SettleRoomProps {
 }
 
 export function SettleRoom({ roomId, contributors, onSettled }: SettleRoomProps) {
-    const { connected, signAndSubmitTransaction } = useWallet();
+    const { connected, account, signTransaction, signAndSubmitTransaction } = useWallet();
     const [scores, setScores] = useState<Record<string, number>>({});
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState<"scores" | "settling">("scores");
@@ -101,29 +102,77 @@ export function SettleRoom({ roomId, contributors, onSettled }: SettleRoomProps)
         try {
             const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
-            // First approve
-            const approveResponse = await signAndSubmitTransaction({
-                data: {
-                    function: `${contractAddress}::settlement::approve_settlement`,
-                    functionArguments: [roomId],
+            // 0. Check if tiers are computed (Safety net for rooms finalized before fix)
+            const [tiersComputed] = await aptos.view({
+                payload: {
+                    function: `${contractAddress}::aggregation::are_tiers_computed`,
+                    functionArguments: [roomId.toString()],
                 },
             });
 
-            await aptos.waitForTransaction({ transactionHash: approveResponse.hash });
+            if (!tiersComputed) {
+                const aggResponse = await submitSponsoredTransaction({
+                    accountAddress: account!.address.toString(),
+                    data: {
+                        function: `${contractAddress}::aggregation::aggregate_tier_votes`,
+                        functionArguments: [roomId],
+                    },
+                    signAndSubmitTransaction,
+                    signTransaction: (tx) => signTransaction(tx),
+                });
+                await aptos.waitForTransaction({ transactionHash: aggResponse.hash });
+            }
 
-            // Then execute tier settlement
-            const settleResponse = await signAndSubmitTransaction({
+            // 1. Process final scores (combine client + jury)
+            const processResponse = await submitSponsoredTransaction({
+                accountAddress: account!.address.toString(),
+                data: {
+                    function: `${contractAddress}::aggregation::process_tier_final_scores`,
+                    functionArguments: [roomId],
+                },
+                signAndSubmitTransaction,
+                signTransaction: (tx) => signTransaction(tx),
+            });
+
+            await aptos.waitForTransaction({ transactionHash: processResponse.hash });
+
+            // 2. Approve (Idempotent check)
+            const [isApproved] = await aptos.view({
+                payload: {
+                    function: `${contractAddress}::settlement::is_approved`,
+                    functionArguments: [roomId.toString()],
+                },
+            });
+
+            if (!isApproved) {
+                const approveResponse = await submitSponsoredTransaction({
+                    accountAddress: account!.address.toString(),
+                    data: {
+                        function: `${contractAddress}::settlement::approve_settlement`,
+                        functionArguments: [roomId],
+                    },
+                    signAndSubmitTransaction,
+                    signTransaction: (tx) => signTransaction(tx),
+                });
+                await aptos.waitForTransaction({ transactionHash: approveResponse.hash });
+            }
+
+            // 3. Execute
+            const settleResponse = await submitSponsoredTransaction({
+                accountAddress: account!.address.toString(),
                 data: {
                     function: `${contractAddress}::settlement::execute_tier_settlement`,
                     functionArguments: [roomId],
                 },
+                signAndSubmitTransaction,
+                signTransaction: (tx) => signTransaction(tx),
             });
 
             await aptos.waitForTransaction({ transactionHash: settleResponse.hash });
             onSettled();
         } catch (err) {
             console.error("Error settling:", err);
-            setError("Failed to settle room");
+            setError("Failed to settle room (Sim: " + (err as any).toString() + ")");
         } finally {
             setLoading(false);
         }

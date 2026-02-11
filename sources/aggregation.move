@@ -210,7 +210,7 @@ module aptosroom::aggregation {
     /// Aggregate tier votes for all contributors in a room
     /// Uses majority vote: count A/B/C votes, pick the tier with most votes
     /// Ties favor higher tier (A > B > C)
-    public fun aggregate_tier_votes(room_id: u64) {
+    public entry fun aggregate_tier_votes(room_id: u64) {
         let jury_pool = room::get_jury_pool(room_id);
         let contributors = room::get_contributor_list(room_id);
 
@@ -357,7 +357,7 @@ module aptosroom::aggregation {
 
     /// Process final scores using per-contributor tier-based jury scores
     /// Uses the new formula: final = (0.6 * client_score) + tier_score
-    public fun process_tier_final_scores(room_id: u64) {
+    public entry fun process_tier_final_scores(room_id: u64) {
         let contributors = room::get_contributor_list(room_id);
         let len = vector::length(&contributors);
 
