@@ -26,6 +26,7 @@ interface RoomData {
     category: string;
     contributors: string[];
     juryPool: string[];
+    submissions: Record<string, string>; // contributor address -> submission text
 }
 
 // Direct view function helpers (only using actual #[view] functions)
@@ -60,13 +61,42 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
                 viewFn("get_jury_pool", [rid]).catch(() => [[]]),
             ]);
 
+            const contributors = (contributorsRes[0] as string[]) || [];
+
+            // Fetch submission data for each contributor
+            const submissions: Record<string, string> = {};
+            await Promise.all(
+                contributors.map(async (addr) => {
+                    try {
+                        const [dataRes] = await viewFn("get_submission_data_hash", [rid, addr]);
+                        // dataRes is hex string like "0x68747470..." — decode to UTF-8
+                        const hexStr = String(dataRes);
+                        if (hexStr.startsWith("0x")) {
+                            const bytes = new Uint8Array(
+                                hexStr.slice(2).match(/.{1,2}/g)!.map((b: string) => parseInt(b, 16))
+                            );
+                            submissions[addr] = new TextDecoder().decode(bytes);
+                        } else if (Array.isArray(dataRes)) {
+                            // If returned as number array
+                            const bytes = new Uint8Array(dataRes as number[]);
+                            submissions[addr] = new TextDecoder().decode(bytes);
+                        } else {
+                            submissions[addr] = hexStr;
+                        }
+                    } catch {
+                        submissions[addr] = "";
+                    }
+                })
+            );
+
             setRoom({
                 id: roomId,
                 state: Number(stateRes[0]),
                 client: stateRes[0] !== undefined ? String(clientRes[0]) : "",
                 category: String(categoryRes[0]),
-                contributors: (contributorsRes[0] as string[]) || [],
+                contributors,
                 juryPool: (juryRes[0] as string[]) || [],
+                submissions,
             });
         } catch (err) {
             console.error("Error fetching room:", err);
@@ -120,21 +150,57 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
     const handleStartJuryPhase = () => executeAction("room::start_jury_phase", [roomId]);
     const handleStartRevealPhase = () => executeAction("room::start_reveal_phase", [roomId]);
     const handleFinalizeRoom = async () => {
-        // 1. Check if tiers are computed
+        if (!connected || !account) {
+            setError("Wallet not connected. Please reconnect.");
+            return;
+        }
+
+        setActionLoading(true);
+        setError(null);
+        const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
+
         try {
+            // 1. Check if tiers are computed
             const [areTiersComputed] = await viewFn("are_tiers_computed", [roomId.toString()], "aggregation");
 
             if (!areTiersComputed) {
                 // 2. Aggregate tier votes first
-                await executeAction("aggregation::aggregate_tier_votes", [roomId]);
-                // Need to wait? executeAction calls waitForTransaction
+                console.log("Aggregating tier votes...");
+                const aggResponse = await submitSponsoredTransaction({
+                    accountAddress: account.address.toString(),
+                    data: {
+                        function: `${contractAddress}::aggregation::aggregate_tier_votes` as `${string}::${string}::${string}`,
+                        functionArguments: [roomId] as any,
+                    },
+                    signAndSubmitTransaction,
+                    signTransaction,
+                });
+                await aptos.waitForTransaction({ transactionHash: aggResponse.hash });
+                console.log("Tier votes aggregated successfully.");
             }
 
             // 3. Finalize room
-            executeAction("room::finalize_room", [roomId]);
-        } catch (e) {
-            console.error("Error finalizing:", e);
-            setError("Failed to finalize room");
+            console.log("Finalizing room...");
+            const finalizeResponse = await submitSponsoredTransaction({
+                accountAddress: account.address.toString(),
+                data: {
+                    function: `${contractAddress}::room::finalize_room` as `${string}::${string}::${string}`,
+                    functionArguments: [roomId] as any,
+                },
+                signAndSubmitTransaction,
+                signTransaction,
+            });
+            await aptos.waitForTransaction({ transactionHash: finalizeResponse.hash });
+            console.log("Room finalized successfully.");
+
+            await fetchRoomData();
+            onAction();
+        } catch (err: any) {
+            console.error("Error finalizing:", err);
+            const msg = err?.message || err?.toString() || "Unknown error";
+            setError(`Failed to finalize room: ${msg}`);
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -335,19 +401,41 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
                     </div>
                 )}
 
-                {/* Show contributors list */}
+                {/* Show contributors & their submissions */}
                 {room.contributors.length > 0 && (
                     <div className="mt-4">
-                        <h4 className="text-sm font-medium text-gray-400 mb-2">Contributors</h4>
-                        <div className="space-y-1">
-                            {room.contributors.map((addr) => (
-                                <div key={addr} className="text-xs font-mono text-gray-300">
-                                    {formatAddress(addr)}
-                                    {connected && account && addr.toLowerCase() === account.address.toString().toLowerCase() && (
-                                        <span className="text-cyan-400 ml-2">(You)</span>
-                                    )}
-                                </div>
-                            ))}
+                        <h4 className="text-sm font-medium text-gray-400 mb-2">Contributors & Submissions</h4>
+                        <div className="space-y-3">
+                            {room.contributors.map((addr) => {
+                                const submissionText = room.submissions[addr] || "";
+                                const isUrl = submissionText.startsWith("http://") || submissionText.startsWith("https://");
+                                return (
+                                    <div key={addr} className="p-2 bg-gray-800/50 rounded border border-gray-700">
+                                        <div className="text-xs font-mono text-gray-300">
+                                            {formatAddress(addr)}
+                                            {connected && account && addr.toLowerCase() === account.address.toString().toLowerCase() && (
+                                                <span className="text-cyan-400 ml-2">(You)</span>
+                                            )}
+                                        </div>
+                                        {submissionText && (
+                                            <div className="mt-1">
+                                                {isUrl ? (
+                                                    <a
+                                                        href={submissionText}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-xs text-blue-400 hover:underline break-all"
+                                                    >
+                                                        🔗 {submissionText}
+                                                    </a>
+                                                ) : (
+                                                    <p className="text-xs text-gray-400 break-all">📄 {submissionText}</p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

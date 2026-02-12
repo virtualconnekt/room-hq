@@ -30,32 +30,61 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
     const [error, setError] = useState<string | null>(null);
     const [hasCommitted, setHasCommitted] = useState(false);
     const [hasRevealed, setHasRevealed] = useState(false);
+    const [checkingStatus, setCheckingStatus] = useState(true); // Prevent premature render
 
     const slots = getTierSlots(contributors.length);
 
     // Load stored vote data on mount
     useEffect(() => {
-        if (!connected || !account) return;
+        if (!connected || !account) {
+            setCheckingStatus(false);
+            return;
+        }
 
         const checkStatus = async () => {
+            const addr = account.address.toString();
+            const CONTRACT = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
+            console.log("[TierVote] Checking status for room", roomId, "juror", addr);
+
+            // 1. Check on-chain first (source of truth)
             try {
-                const committed = await juryClient.hasTierVote(roomId, account.address.toString());
-                setHasCommitted(committed);
+                const [committed] = await aptos.view({
+                    payload: {
+                        function: `${CONTRACT}::jury::has_committed_tier` as `${string}::${string}::${string}`,
+                        functionArguments: [roomId.toString(), addr],
+                    },
+                });
+                console.log("[TierVote] On-chain has_committed_tier:", committed);
 
                 if (committed) {
-                    const revealed = await juryClient.isTierVoteRevealed(roomId, account.address.toString());
-                    setHasRevealed(revealed);
-                }
+                    setHasCommitted(true);
 
-                // Load stored vote for reveal
-                const stored = getStoredVote(roomId, account.address.toString());
-                if (stored) {
-                    setTierA(new Set(stored.tierA));
-                    setTierB(new Set(stored.tierB));
+                    // Check if already revealed
+                    const [revealed] = await aptos.view({
+                        payload: {
+                            function: `${CONTRACT}::jury::has_revealed_tier` as `${string}::${string}::${string}`,
+                            functionArguments: [roomId.toString(), addr],
+                        },
+                    });
+                    console.log("[TierVote] On-chain has_revealed_tier:", revealed);
+                    if (revealed) setHasRevealed(true);
                 }
             } catch (err) {
-                console.error("Error checking vote status:", err);
+                console.error("[TierVote] On-chain check failed:", err);
             }
+
+            // 2. Load stored vote data from localStorage (needed for reveal)
+            const stored = getStoredVote(roomId, addr);
+            if (stored) {
+                console.log("[TierVote] localStorage has vote data ✓");
+                setTierA(new Set(stored.tierA));
+                setTierB(new Set(stored.tierB));
+                setHasCommitted(true);
+            } else {
+                console.log("[TierVote] localStorage has NO vote data. Key: aptosroom_vote_" + roomId + "_" + addr);
+            }
+
+            setCheckingStatus(false);
         };
 
         checkStatus();
@@ -132,7 +161,13 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
                         tierB: tierBList,
                         salt: salt
                     }, pubKeyBytes);
-                    encryptedData = Array.from(encrypted);
+
+                    if (encrypted.length > 1024) {
+                        console.warn("Encrypted data too large for on-chain storage, skipping backup.");
+                        encryptedData = [];
+                    } else {
+                        encryptedData = Array.from(encrypted);
+                    }
                 } catch (e) {
                     console.warn("Failed to encrypt vote data, proceeding without on-chain backup:", e);
                 }
@@ -155,9 +190,11 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
             await aptos.waitForTransaction({ transactionHash: response.hash });
             setHasCommitted(true);
             onVoteCommitted();
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error committing vote:", err);
-            setError("Failed to commit vote");
+            // Extract error message from Aptos error if possible
+            const msg = err?.data?.message || err?.message || err?.toString() || "Unknown error";
+            setError(`Failed to commit vote: ${msg}`);
         } finally {
             setLoading(false);
         }
@@ -200,9 +237,10 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
             clearStoredVote(roomId, account.address.toString());
             setHasRevealed(true);
             onVoteCommitted();
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error revealing vote:", err);
-            setError("Failed to reveal vote. Make sure your stored data matches.");
+            const msg = err?.data?.message || err?.message || err?.toString() || "Unknown error";
+            setError(`Failed to reveal vote: ${msg}. Make sure your stored data matches.`);
         } finally {
             setLoading(false);
         }
@@ -221,10 +259,22 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
 
     // Reveal mode
     if (isReveal) {
+        // Still checking status — show loading instead of premature error
+        if (checkingStatus) {
+            return (
+                <div className="bg-gray-500/10 border border-gray-500/30 rounded-lg p-4 text-center">
+                    <span className="text-gray-400">Checking vote status...</span>
+                </div>
+            );
+        }
+
         if (!hasCommitted) {
             return (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-center">
-                    <span className="text-yellow-400">You haven&apos;t committed a vote</span>
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                    <p className="text-yellow-400 text-center">You haven&apos;t committed a vote</p>
+                    <p className="text-gray-500 text-xs mt-2 text-center">
+                        This may happen if you cleared browser data or committed from a different browser.
+                    </p>
                 </div>
             );
         }

@@ -308,7 +308,7 @@ export class JuryClient {
   async hasTierVote(roomId: number, juror: string): Promise<boolean> {
     const result = await this.aptos.view({
       payload: {
-        function: `${this.moduleAddress}::jury::has_tier_vote`,
+        function: `${this.moduleAddress}::jury::has_committed_tier`,
         functionArguments: [BigInt(roomId), juror],
       },
     });
@@ -321,7 +321,7 @@ export class JuryClient {
   async isTierVoteRevealed(roomId: number, juror: string): Promise<boolean> {
     const result = await this.aptos.view({
       payload: {
-        function: `${this.moduleAddress}::jury::is_tier_vote_revealed`,
+        function: `${this.moduleAddress}::jury::has_revealed_tier`,
         functionArguments: [BigInt(roomId), juror],
       },
     });

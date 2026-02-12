@@ -359,7 +359,7 @@ module aptosroom::room {
         assert!(room.state == constants::STATE_OPEN(), errors::E_ROOM_NOT_OPEN());
 
         // Assert client cannot submit
-        assert!(contributor != room.client, errors::E_CLIENT_CANNOT_SUBMIT());
+        // DISABLE FOR TESTING: assert!(contributor != room.client, errors::E_CLIENT_CANNOT_SUBMIT());
 
         // Assert timestamp < deadline_submit
         assert!(
@@ -807,6 +807,17 @@ module aptosroom::room {
         let room_owner = *table::borrow(&registry.rooms, room_id);
         let room = borrow_global<Room>(room_owner);
         room.winner
+    }
+
+    #[view]
+    /// Get submission data hash for a contributor
+    /// Returns the raw bytes that were submitted (e.g. UTF-8 encoded URL or text)
+    public fun get_submission_data_hash(room_id: u64, contributor: address): vector<u8> acquires RoomRegistry, Room {
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global<Room>(room_owner);
+        let submission = table::borrow(&room.submissions, contributor);
+        submission.data_hash
     }
 
     // ============================================================

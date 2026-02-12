@@ -189,7 +189,7 @@ export function SettleRoom({ roomId, contributors, onSettled }: SettleRoomProps)
             {step === "scores" && (
                 <>
                     <p className="text-sm text-gray-400">
-                        Set your score (0-100) for each contributor before settling.
+                        Rate each contributor (0-100). Your score counts for <span className="text-cyan-400 font-medium">60%</span> of the final score, jury votes count for <span className="text-purple-400 font-medium">40%</span>.
                     </p>
 
                     <div className="space-y-3">
