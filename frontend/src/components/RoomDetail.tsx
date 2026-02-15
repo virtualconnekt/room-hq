@@ -46,7 +46,8 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
     const [actionLoading, setActionLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [submitHash, setSubmitHash] = useState("");
-
+    const [clientScores, setClientScores] = useState<Record<string, number>>({});
+    const [scoredContributors, setScoredContributors] = useState<Set<string>>(new Set());
     const fetchRoomData = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -149,6 +150,32 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
     };
     const handleStartJuryPhase = () => executeAction("room::start_jury_phase", [roomId]);
     const handleStartRevealPhase = () => executeAction("room::start_reveal_phase", [roomId]);
+
+    const handleSetClientScore = async (contributor: string) => {
+        if (!connected || !account) return;
+        const score = clientScores[contributor];
+        if (score === undefined || score < 0 || score > 100) {
+            setError("Score must be between 0 and 100");
+            return;
+        }
+        setActionLoading(true);
+        setError(null);
+        try {
+            const response = await signAndSubmitTransaction({
+                data: {
+                    function: `${CONTRACT_ADDRESS}::room::set_client_score`,
+                    functionArguments: [roomId, contributor, score],
+                },
+            });
+            await aptos.waitForTransaction({ transactionHash: response.hash });
+            setScoredContributors(prev => new Set([...prev, contributor]));
+        } catch (err: any) {
+            console.error("Error setting client score:", err);
+            setError(`Failed to set score: ${err?.message || err}`);
+        } finally {
+            setActionLoading(false);
+        }
+    };
     const handleFinalizeRoom = async () => {
         if (!connected || !account) {
             setError("Wallet not connected. Please reconnect.");
@@ -331,15 +358,52 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
                     </button>
                 )}
 
-                {/* CLOSED: Client starts jury phase */}
+                {/* CLOSED: Client scores contributors, then starts jury phase */}
                 {room.state === ROOM_STATES.CLOSED && isClient && (
-                    <button
-                        onClick={handleStartJuryPhase}
-                        disabled={actionLoading}
-                        className="btn btn-primary w-full"
-                    >
-                        {actionLoading ? "Starting..." : "Start Jury Phase (Auto-Select Jury)"}
-                    </button>
+                    <div className="space-y-4">
+                        <p className="text-sm text-gray-400">
+                            Rate each contributor (0-100). Your score counts for <span className="text-cyan-400 font-medium">60%</span> of the final score, jury votes count for <span className="text-purple-400 font-medium">40%</span>.
+                        </p>
+
+                        <div className="space-y-2">
+                            {room.contributors.map((addr) => (
+                                <div key={addr} className="flex items-center gap-2">
+                                    <span className="font-mono text-sm flex-1">{addr.slice(0, 6)}...{addr.slice(-4)}</span>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        max={100}
+                                        placeholder="50"
+                                        className="w-20 text-center"
+                                        disabled={actionLoading || scoredContributors.has(addr)}
+                                        value={clientScores[addr] ?? ""}
+                                        onChange={(e) => setClientScores(prev => ({ ...prev, [addr]: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) }))}
+                                    />
+                                    {scoredContributors.has(addr) ? (
+                                        <span className="text-green-400 text-sm">✓</span>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleSetClientScore(addr)}
+                                            disabled={actionLoading}
+                                            className="btn btn-secondary text-xs py-1 px-2"
+                                        >
+                                            {actionLoading ? "..." : "Set"}
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        <button
+                            onClick={handleStartJuryPhase}
+                            disabled={actionLoading || !room.contributors.every(c => scoredContributors.has(c))}
+                            className="btn btn-primary w-full"
+                        >
+                            {actionLoading ? "Starting..." : room.contributors.every(c => scoredContributors.has(c))
+                                ? "Start Jury Phase"
+                                : `Score all contributors first (${scoredContributors.size}/${room.contributors.length})`}
+                        </button>
+                    </div>
                 )}
 
                 {/* JURY_ACTIVE: Jury commits */}
@@ -383,7 +447,7 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
                     </button>
                 )}
 
-                {/* FINALIZED: Client scores and settles */}
+                {/* FINALIZED: Client settles (scores already set) */}
                 {room.state === ROOM_STATES.FINALIZED && isClient && (
                     <SettleRoom
                         roomId={roomId}

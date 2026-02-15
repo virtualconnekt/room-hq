@@ -510,6 +510,16 @@ module aptosroom::room {
         // Jury should already be selected (non-empty pool)
         assert!(!vector::is_empty(&room.jury_pool), errors::E_JURY_NOT_SELECTED());
 
+        // All contributors must be scored before jury starts
+        let i = 0;
+        let len = vector::length(&room.contributor_list);
+        while (i < len) {
+            let contributor = *vector::borrow(&room.contributor_list, i);
+            let submission = table::borrow(&room.submissions, contributor);
+            assert!(option::is_some(&submission.client_score), errors::E_SCORES_INCOMPLETE());
+            i = i + 1;
+        };
+
         // Update state
         room.state = to_state;
 
@@ -586,6 +596,8 @@ module aptosroom::room {
     }
 
     /// Set client score for a submission
+    /// Only allowed in CLOSED state (before jury starts)
+    /// Write-once: cannot change after being set
     public entry fun set_client_score(
         account: &signer,
         room_id: u64,
@@ -600,12 +612,19 @@ module aptosroom::room {
         // Assert caller is client
         assert!(room.client == caller, errors::E_NOT_CLIENT());
 
+        // Only allow scoring in CLOSED state
+        assert!(room.state == constants::STATE_CLOSED(), errors::E_SCORING_WRONG_STATE());
+
         // Assert score <= MAX_SCORE
         assert!(score <= constants::MAX_SCORE(), errors::E_INVALID_SCORE());
 
+        // Write-once: reject if already scored
+        let submission = table::borrow(&room.submissions, contributor);
+        assert!(option::is_none(&submission.client_score), errors::E_SCORE_ALREADY_SET());
+
         // Set submission.client_score
-        let submission = table::borrow_mut(&mut room.submissions, contributor);
-        submission.client_score = option::some(score);
+        let submission_mut = table::borrow_mut(&mut room.submissions, contributor);
+        submission_mut.client_score = option::some(score);
     }
 
     /// Submit work to room

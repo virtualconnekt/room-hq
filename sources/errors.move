@@ -147,6 +147,15 @@ module aptosroom::errors {
     /// Encrypted data exceeds maximum allowed size
     public fun E_ENCRYPTED_DATA_TOO_LARGE(): u64 { 616 }
 
+    /// Scoring only allowed in CLOSED state
+    public fun E_SCORING_WRONG_STATE(): u64 { 617 }
+
+    /// Client score already set for this contributor (write-once)
+    public fun E_SCORE_ALREADY_SET(): u64 { 618 }
+
+    /// Not all contributors scored — cannot start jury phase
+    public fun E_SCORES_INCOMPLETE(): u64 { 619 }
+
     // ============================================================
     // SETTLEMENT ERRORS (700-799)
     // ============================================================
