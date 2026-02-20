@@ -3,7 +3,9 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useEffect, useState, useCallback } from "react";
 import { keycardClient, aptos } from "@/lib/aptosroom";
-import { submitSponsoredTransaction } from "@/lib/sponsoredTransaction";
+import { submitSponsoredTransaction, submitKeylessSponsoredTransaction } from "@/lib/sponsoredTransaction";
+import { enqueueRequest } from "@/lib/rateLimitedClient";
+import { useKeylessAuth } from "./KeylessAuthContext";
 
 interface KeycardData {
     hasKeycard: boolean;
@@ -16,29 +18,31 @@ interface KeycardData {
 
 export function KeycardPanel() {
     const { account, connected, signAndSubmitTransaction, signTransaction } = useWallet();
+    const { keylessAccount, isKeylessUser, keylessAddress } = useKeylessAuth();
     const [keycard, setKeycard] = useState<KeycardData>({ hasKeycard: false });
     const [loading, setLoading] = useState(false);
     const [minting, setMinting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const isAuthenticated = isKeylessUser || (connected && !!account);
+    const activeAddress = isKeylessUser ? keylessAddress : (connected && account ? account.address.toString() : null);
+
     const fetchKeycard = useCallback(async () => {
-        if (!connected || !account) return;
+        if (!isAuthenticated || !activeAddress) return;
 
         setLoading(true);
         setError(null);
 
         try {
-            const address = account.address.toString();
-            const hasCard = await keycardClient.hasKeycard(address);
+            const hasCard = await enqueueRequest(() => keycardClient.hasKeycard(activeAddress));
 
             if (hasCard) {
-                const [id, tasks, jury, variance, score] = await Promise.all([
-                    keycardClient.getKeycardId(address),
-                    keycardClient.getTasksCompleted(address),
-                    keycardClient.getJuryParticipations(address),
-                    keycardClient.getVarianceFlags(address),
-                    keycardClient.getAverageScore(address),
-                ]);
+                // Fetch sequentially through rate-limited queue
+                const id = await enqueueRequest(() => keycardClient.getKeycardId(activeAddress));
+                const tasks = await enqueueRequest(() => keycardClient.getTasksCompleted(activeAddress));
+                const jury = await enqueueRequest(() => keycardClient.getJuryParticipations(activeAddress));
+                const variance = await enqueueRequest(() => keycardClient.getVarianceFlags(activeAddress));
+                const score = await enqueueRequest(() => keycardClient.getAverageScore(activeAddress));
 
                 setKeycard({
                     hasKeycard: true,
@@ -57,14 +61,14 @@ export function KeycardPanel() {
         } finally {
             setLoading(false);
         }
-    }, [connected, account]);
+    }, [isAuthenticated, activeAddress]);
 
     useEffect(() => {
         fetchKeycard();
     }, [fetchKeycard]);
 
     const handleMintKeycard = async () => {
-        if (!connected || !account) return;
+        if (!isAuthenticated || !activeAddress) return;
 
         setMinting(true);
         setError(null);
@@ -72,20 +76,30 @@ export function KeycardPanel() {
         try {
             const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
-            const response = await submitSponsoredTransaction({
-                accountAddress: account.address.toString(),
-                data: {
-                    function: `${contractAddress}::keycard::mint`,
-                    functionArguments: [],
-                },
-                signAndSubmitTransaction,
-                signTransaction,
-            });
+            let hash: string;
+            if (isKeylessUser && keylessAccount) {
+                const response = await submitKeylessSponsoredTransaction({
+                    keylessAccount,
+                    data: {
+                        function: `${contractAddress}::keycard::mint`,
+                        functionArguments: [],
+                    },
+                });
+                hash = response.hash;
+            } else {
+                const response = await submitSponsoredTransaction({
+                    accountAddress: account!.address.toString(),
+                    data: {
+                        function: `${contractAddress}::keycard::mint`,
+                        functionArguments: [],
+                    },
+                    signAndSubmitTransaction,
+                    signTransaction,
+                });
+                hash = response.hash;
+            }
 
-            // Wait for transaction confirmation
-            await aptos.waitForTransaction({ transactionHash: response.hash });
-
-            // Refresh keycard data
+            await aptos.waitForTransaction({ transactionHash: hash });
             await fetchKeycard();
         } catch (err) {
             console.error("Error minting keycard:", err);
@@ -95,11 +109,11 @@ export function KeycardPanel() {
         }
     };
 
-    if (!connected) {
+    if (!isAuthenticated) {
         return (
             <div className="card">
                 <h2 className="text-lg font-semibold mb-2">Your Keycard</h2>
-                <p className="text-gray-400 text-sm">Connect wallet to view keycard</p>
+                <p className="text-gray-400 text-sm">Connect wallet or sign in with Google to view keycard</p>
             </div>
         );
     }
@@ -161,6 +175,9 @@ export function KeycardPanel() {
                     <p className="text-gray-400 text-sm">
                         You need a Keycard to participate in AptosRoom. Mint one to get started.
                     </p>
+                    {isKeylessUser && (
+                        <p className="text-xs text-blue-400">✨ Signed in with Google — minting will be instant.</p>
+                    )}
                     <button
                         onClick={handleMintKeycard}
                         disabled={minting}

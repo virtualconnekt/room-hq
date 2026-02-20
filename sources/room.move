@@ -222,6 +222,24 @@ module aptosroom::room {
         count
     }
 
+    /// Count revealed votes
+    fun count_revealed_votes(room: &Room): u64 {
+        let count = 0u64;
+        let i = 0;
+        let len = vector::length(&room.jury_pool);
+        while (i < len) {
+            let juror = *vector::borrow(&room.jury_pool, i);
+            if (table::contains(&room.tier_votes, juror)) {
+                let vote = table::borrow(&room.tier_votes, juror);
+                if (vote.revealed) {
+                    count = count + 1;
+                };
+            };
+            i = i + 1;
+        };
+        count
+    }
+
     // ============================================================
     // PUBLIC ENTRY FUNCTIONS
     // ============================================================
@@ -422,12 +440,14 @@ module aptosroom::room {
         });
     }
 
-    /// Close room and auto-select jury (OPEN -> CLOSED)
+    /// Close room for submissions (OPEN -> CLOSED)
+    /// NOTE: eligible_jurors and jury_size are kept for ABI backward-compatibility
+    /// but are IGNORED. Jury selection is done via jury::start_jury_phase_random.
     public entry fun close_room_with_jury(
         account: &signer,
         room_id: u64,
-        eligible_jurors: vector<address>,
-        jury_size: u64,
+        _eligible_jurors: vector<address>,
+        _jury_size: u64,
     ) acquires RoomRegistry, Room {
         let caller = signer::address_of(account);
         let registry = borrow_global<RoomRegistry>(@aptosroom);
@@ -446,42 +466,6 @@ module aptosroom::room {
 
         // Update state
         room.state = to_state;
-
-        // Auto-select jury: validate enough eligible jurors
-        let len = vector::length(&eligible_jurors);
-        assert!(len >= jury_size, errors::E_INSUFFICIENT_JURORS());
-
-        // Simple deterministic selection: take first jury_size from shuffled list
-        let mut_jurors = eligible_jurors;
-        // Fisher-Yates shuffle with room_id as seed
-        let n = vector::length(&mut_jurors);
-        if (n > 1) {
-            let i = n - 1;
-            while (i > 0) {
-                let combined = room_id * 1000000 + i;
-                let bytes = bcs::to_bytes(&combined);
-                let hash_bytes = hash::sha3_256(bytes);
-                let value: u64 = 0;
-                let k = 0;
-                while (k < 8) {
-                    value = (value << 8) | (*vector::borrow(&hash_bytes, k) as u64);
-                    k = k + 1;
-                };
-                let j = value % (i + 1);
-                vector::swap(&mut mut_jurors, i, j);
-                i = i - 1;
-            };
-        };
-
-        // Take first jury_size elements
-        let selected = vector::empty<address>();
-        let i = 0;
-        while (i < jury_size) {
-            vector::push_back(&mut selected, *vector::borrow(&mut_jurors, i));
-            i = i + 1;
-        };
-
-        room.jury_pool = selected;
 
         // Emit event
         event::emit(RoomStateChanged {
@@ -521,6 +505,54 @@ module aptosroom::room {
         };
 
         // Update state
+        room.state = to_state;
+
+        // Emit event
+        event::emit(RoomStateChanged {
+            room_id,
+            from_state,
+            to_state,
+            timestamp: timestamp::now_seconds(),
+        });
+    }
+
+    /// Set jury pool and transition to JURY_ACTIVE (called by jury::start_jury_phase_random)
+    /// Only callable by aptosroom::jury (friend module)
+    public(friend) fun set_jury_pool(
+        account: &signer,
+        room_id: u64,
+        selected_jurors: vector<address>,
+    ) acquires RoomRegistry, Room {
+        let caller = signer::address_of(account);
+        let registry = borrow_global<RoomRegistry>(@aptosroom);
+        let room_owner = *table::borrow(&registry.rooms, room_id);
+        let room = borrow_global_mut<Room>(room_owner);
+
+        // Only client or deployer (@aptosroom) can assign jury
+        assert!(room.client == caller || caller == @aptosroom, errors::E_NOT_CLIENT());
+
+        // Must be in CLOSED state
+        assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+
+        // Must have at least one juror
+        assert!(!vector::is_empty(&selected_jurors), errors::E_INSUFFICIENT_JURORS());
+
+        // All contributors must be scored before jury starts
+        let i = 0;
+        let len = vector::length(&room.contributor_list);
+        while (i < len) {
+            let contributor = *vector::borrow(&room.contributor_list, i);
+            let submission = table::borrow(&room.submissions, contributor);
+            assert!(option::is_some(&submission.client_score), errors::E_SCORES_INCOMPLETE());
+            i = i + 1;
+        };
+
+        // Assign jury pool
+        room.jury_pool = selected_jurors;
+
+        // Transition to JURY_ACTIVE
+        let from_state = room.state;
+        let to_state = constants::STATE_JURY_ACTIVE();
         room.state = to_state;
 
         // Emit event
@@ -579,6 +611,11 @@ module aptosroom::room {
         let from_state = room.state;
         let to_state = constants::STATE_FINALIZED();
         assert!(is_valid_transition(from_state, to_state), errors::E_INVALID_STATE_TRANSITION());
+
+        // Assert past reveal deadline or all revealed
+        let past_deadline = timestamp::now_seconds() >= room.deadline_jury_reveal;
+        let all_revealed = count_revealed_votes(room) == vector::length(&room.jury_pool);
+        assert!(past_deadline || all_revealed, errors::E_REVEAL_PHASE_NOT_COMPLETE());
 
         // Note: Variance detection and score calculation done by aggregation module
         // before this transition
@@ -843,13 +880,7 @@ module aptosroom::room {
     // INTERNAL FUNCTIONS (for other modules via friend)
     // ============================================================
 
-    /// Set jury pool (called by jury module)
-    public(friend) fun set_jury_pool(room_id: u64, jurors: vector<address>) acquires RoomRegistry, Room {
-        let registry = borrow_global<RoomRegistry>(@aptosroom);
-        let room_owner = *table::borrow(&registry.rooms, room_id);
-        let room = borrow_global_mut<Room>(room_owner);
-        room.jury_pool = jurors;
-    }
+
 
     /// Add vote to room (called by jury module)
     public(friend) fun add_vote(

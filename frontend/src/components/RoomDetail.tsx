@@ -8,9 +8,11 @@ import {
     STATE_LABELS,
     STATE_BADGES,
 } from "@/lib/aptosroom";
-import { submitSponsoredTransaction } from "@/lib/sponsoredTransaction";
+import { submitSponsoredTransaction, submitKeylessSponsoredTransaction } from "@/lib/sponsoredTransaction";
+import { enqueueRequest } from "@/lib/rateLimitedClient";
 import { TierVote } from "./TierVote";
 import { SettleRoom } from "./SettleRoom";
+import { useKeylessAuth } from "./KeylessAuthContext";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
@@ -31,16 +33,19 @@ interface RoomData {
 
 // Direct view function helpers (only using actual #[view] functions)
 async function viewFn(fnName: string, args: string[], moduleName = "room"): Promise<any[]> {
-    return aptos.view({
-        payload: {
-            function: `${CONTRACT_ADDRESS}::${moduleName}::${fnName}` as `${string}::${string}::${string}`,
-            functionArguments: args,
-        },
-    });
+    return enqueueRequest(() =>
+        aptos.view({
+            payload: {
+                function: `${CONTRACT_ADDRESS}::${moduleName}::${fnName}` as `${string}::${string}::${string}`,
+                functionArguments: args,
+            },
+        })
+    );
 }
 
 export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
     const { account, connected, signAndSubmitTransaction, signTransaction } = useWallet();
+    const { keylessAccount, isKeylessUser, keylessAddress } = useKeylessAuth();
     const [room, setRoom] = useState<RoomData | null>(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
@@ -48,6 +53,48 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
     const [submitHash, setSubmitHash] = useState("");
     const [clientScores, setClientScores] = useState<Record<string, number>>({});
     const [scoredContributors, setScoredContributors] = useState<Set<string>>(new Set());
+
+    // Unified address: keyless takes priority
+    const activeAddress = isKeylessUser ? keylessAddress : (connected && account ? account.address.toString() : null);
+    const isAuthenticated = isKeylessUser || (connected && !!account);
+
+    // Helper: sign and submit via keyless or wallet
+    const signAndSubmit = async (functionName: string, args: any[]): Promise<string> => {
+        const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
+        const data = {
+            function: `${contractAddress}::${functionName}` as `${string}::${string}::${string}`,
+            functionArguments: args,
+        };
+        if (isKeylessUser && keylessAccount) {
+            const response = await submitKeylessSponsoredTransaction({ keylessAccount, data });
+            return response.hash;
+        } else {
+            const response = await submitSponsoredTransaction({
+                accountAddress: account!.address.toString(),
+                data: data as any,
+                signAndSubmitTransaction,
+                signTransaction,
+            });
+            return response.hash;
+        }
+    };
+
+    // Submit jury::start_jury_phase_random via server-side API route.
+    // The deployer key pays gas — users don't need APT.
+    // This bypasses the Gas Station plugin which can't sponsor #[randomness] functions.
+    const submitJuryPhaseViaServer = async (roomId: number, eligibleJurors: string[], jurySize: number): Promise<string> => {
+        const res = await fetch("/api/jury-phase", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ roomId, eligibleJurors, jurySize }),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: res.statusText }));
+            throw new Error(err.error || "Server failed to submit jury phase");
+        }
+        const { hash } = await res.json();
+        return hash;
+    };
     const fetchRoomData = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -99,6 +146,24 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
                 juryPool: (juryRes[0] as string[]) || [],
                 submissions,
             });
+
+            // Restore scoredContributors from on-chain state (prevents E_SCORE_ALREADY_SET)
+            if (Number(stateRes[0]) === ROOM_STATES.CLOSED) {
+                const alreadyScored = new Set<string>();
+                await Promise.all(
+                    contributors.map(async (addr) => {
+                        try {
+                            const res = await viewFn("get_client_score", [rid, addr]);
+                            // Returns Option<u64>: [{vec: [score]}] if set, [{vec: []}] if not
+                            const opt = res[0] as { vec: any[] };
+                            if (opt?.vec?.length > 0) {
+                                alreadyScored.add(addr);
+                            }
+                        } catch { /* not scored yet */ }
+                    })
+                );
+                setScoredContributors(alreadyScored);
+            }
         } catch (err) {
             console.error("Error fetching room:", err);
             setError("Failed to load room data");
@@ -112,25 +177,14 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
     }, [fetchRoomData]);
 
     const executeAction = async (functionName: string, args: unknown[] = []) => {
-        if (!connected || !account) return;
+        if (!isAuthenticated) return;
 
         setActionLoading(true);
         setError(null);
 
         try {
-            const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
-
-            const response = await submitSponsoredTransaction({
-                accountAddress: account.address.toString(),
-                data: {
-                    function: `${contractAddress}::${functionName}` as `${string}::${string}::${string}`,
-                    functionArguments: args as any,
-                },
-                signAndSubmitTransaction,
-                signTransaction,
-            });
-
-            await aptos.waitForTransaction({ transactionHash: response.hash });
+            const hash = await signAndSubmit(functionName, args as any[]);
+            await aptos.waitForTransaction({ transactionHash: hash });
             await fetchRoomData();
             onAction();
         } catch (err) {
@@ -142,17 +196,50 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
     };
 
     const handleOpenRoom = () => executeAction("room::open_room", [roomId]);
-    const handleCloseRoom = () => {
-        // Pass contributors as eligible jurors, jury_size=1 for testnet
+    const handleCloseRoom = async () => {
+        if (!isAuthenticated || actionLoading) return;
         const eligibleJurors = room?.contributors || [];
-        const jurySize = Math.min(eligibleJurors.length, 1); // Use 1 for testnet (min jurors)
-        executeAction("room::close_room_with_jury", [roomId, eligibleJurors, jurySize]);
+        const jurySize = Math.min(eligibleJurors.length, 1); // 1 for testnet
+
+        setActionLoading(true);
+        setError(null);
+        try {
+            // Step 1: close the room only if it's still OPEN
+            if (room?.state === ROOM_STATES.OPEN) {
+                try {
+                    // Use close_room (simpler than close_room_with_jury)
+                    const hash1 = await signAndSubmit("room::close_room", [roomId]);
+                    await aptos.waitForTransaction({ transactionHash: hash1 });
+                } catch (e: any) {
+                    // Check for E_INVALID_STATE_TRANSITION (0x190 / 400)
+                    // If room is already closed (stale frontend state), proceed to step 2
+                    const errStr = JSON.stringify(e);
+                    if (errStr.includes("0x190") || errStr.includes("400")) {
+                        console.warn("Room likely already closed, proceeding to jury phase");
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+
+            // Step 2: select jurors with true on-chain randomness (CLOSED -> JURY_ACTIVE)
+            // Submitted server-side (deployer pays gas) — #[randomness] can't use fee payer
+            const hash2 = await submitJuryPhaseViaServer(roomId, eligibleJurors, jurySize);
+            await aptos.waitForTransaction({ transactionHash: hash2 });
+
+            await fetchRoomData();
+            onAction();
+        } catch (err) {
+            console.error("Error closing room / selecting jury:", err);
+            setError("Failed to cleanup room");
+        } finally {
+            setActionLoading(false);
+        }
     };
-    const handleStartJuryPhase = () => executeAction("room::start_jury_phase", [roomId]);
     const handleStartRevealPhase = () => executeAction("room::start_reveal_phase", [roomId]);
 
     const handleSetClientScore = async (contributor: string) => {
-        if (!connected || !account) return;
+        if (!isAuthenticated) return;
         const score = clientScores[contributor];
         if (score === undefined || score < 0 || score > 100) {
             setError("Score must be between 0 and 100");
@@ -161,13 +248,8 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
         setActionLoading(true);
         setError(null);
         try {
-            const response = await signAndSubmitTransaction({
-                data: {
-                    function: `${CONTRACT_ADDRESS}::room::set_client_score`,
-                    functionArguments: [roomId, contributor, score],
-                },
-            });
-            await aptos.waitForTransaction({ transactionHash: response.hash });
+            const hash = await signAndSubmit("room::set_client_score", [roomId, contributor, score]);
+            await aptos.waitForTransaction({ transactionHash: hash });
             setScoredContributors(prev => new Set([...prev, contributor]));
         } catch (err: any) {
             console.error("Error setting client score:", err);
@@ -177,47 +259,29 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
         }
     };
     const handleFinalizeRoom = async () => {
-        if (!connected || !account) {
-            setError("Wallet not connected. Please reconnect.");
+        if (!isAuthenticated) {
+            setError("Not connected. Please log in.");
             return;
         }
 
         setActionLoading(true);
         setError(null);
-        const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
         try {
             // 1. Check if tiers are computed
             const [areTiersComputed] = await viewFn("are_tiers_computed", [roomId.toString()], "aggregation");
 
             if (!areTiersComputed) {
-                // 2. Aggregate tier votes first
                 console.log("Aggregating tier votes...");
-                const aggResponse = await submitSponsoredTransaction({
-                    accountAddress: account.address.toString(),
-                    data: {
-                        function: `${contractAddress}::aggregation::aggregate_tier_votes` as `${string}::${string}::${string}`,
-                        functionArguments: [roomId] as any,
-                    },
-                    signAndSubmitTransaction,
-                    signTransaction,
-                });
-                await aptos.waitForTransaction({ transactionHash: aggResponse.hash });
+                const aggHash = await signAndSubmit("aggregation::aggregate_tier_votes", [roomId]);
+                await aptos.waitForTransaction({ transactionHash: aggHash });
                 console.log("Tier votes aggregated successfully.");
             }
 
-            // 3. Finalize room
+            // 2. Finalize room
             console.log("Finalizing room...");
-            const finalizeResponse = await submitSponsoredTransaction({
-                accountAddress: account.address.toString(),
-                data: {
-                    function: `${contractAddress}::room::finalize_room` as `${string}::${string}::${string}`,
-                    functionArguments: [roomId] as any,
-                },
-                signAndSubmitTransaction,
-                signTransaction,
-            });
-            await aptos.waitForTransaction({ transactionHash: finalizeResponse.hash });
+            const finalizeHash = await signAndSubmit("room::finalize_room", [roomId]);
+            await aptos.waitForTransaction({ transactionHash: finalizeHash });
             console.log("Room finalized successfully.");
 
             await fetchRoomData();
@@ -258,12 +322,13 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
         );
     }
 
-    const isClient = connected && account && account.address.toString().toLowerCase() === room.client.toLowerCase();
-    const isContributor = connected && account && room.contributors.some(
-        c => c.toLowerCase() === account.address.toString().toLowerCase()
+    const userAddr = activeAddress?.toLowerCase();
+    const isClient = isAuthenticated && userAddr === room.client.toLowerCase();
+    const isContributor = isAuthenticated && room.contributors.some(
+        c => c.toLowerCase() === userAddr
     );
-    const isJuror = connected && account && room.juryPool.some(
-        j => j.toLowerCase() === account.address.toString().toLowerCase()
+    const isJuror = isAuthenticated && room.juryPool.some(
+        j => j.toLowerCase() === userAddr
     );
 
     const formatAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -395,7 +460,23 @@ export function RoomDetail({ roomId, onAction }: RoomDetailProps) {
                         </div>
 
                         <button
-                            onClick={handleStartJuryPhase}
+                            onClick={async () => {
+                                const eligibleJurors = room?.contributors || [];
+                                const jurySize = Math.min(eligibleJurors.length, 1);
+                                setActionLoading(true);
+                                setError(null);
+                                try {
+                                    const hash = await submitJuryPhaseViaServer(roomId, eligibleJurors, jurySize);
+                                    await aptos.waitForTransaction({ transactionHash: hash });
+                                    await fetchRoomData();
+                                    onAction();
+                                } catch (err) {
+                                    console.error("Error starting jury phase:", err);
+                                    setError("Failed to start jury phase");
+                                } finally {
+                                    setActionLoading(false);
+                                }
+                            }}
                             disabled={actionLoading || !room.contributors.every(c => scoredContributors.has(c))}
                             className="btn btn-primary w-full"
                         >

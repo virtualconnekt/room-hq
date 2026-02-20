@@ -3,7 +3,8 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useState } from "react";
 import { aptos, parseApt, formatApt, keycardClient } from "@/lib/aptosroom";
-import { submitSponsoredTransaction } from "@/lib/sponsoredTransaction";
+import { submitSponsoredTransaction, submitKeylessSponsoredTransaction } from "@/lib/sponsoredTransaction";
+import { useKeylessAuth } from "./KeylessAuthContext";
 
 interface CreateRoomProps {
     onRoomCreated: () => void;
@@ -11,9 +12,13 @@ interface CreateRoomProps {
 
 export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
     const { account, connected, signAndSubmitTransaction, signTransaction } = useWallet();
+    const { keylessAccount, isKeylessUser, keylessAddress } = useKeylessAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [creating, setCreating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const isAuthenticated = isKeylessUser || (connected && !!account);
+    const activeAddress = isKeylessUser ? keylessAddress : (connected && account ? account.address.toString() : null);
 
     // Form state
     const [category, setCategory] = useState("design");
@@ -23,21 +28,44 @@ export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
     const [commitDeadlineHours, setCommitDeadlineHours] = useState("48");
     const [revealDeadlineHours, setRevealDeadlineHours] = useState("72");
 
+    // Helper: sign and submit via keyless or wallet
+    const signAndSubmit = async (functionName: string, args: any[]): Promise<string> => {
+        const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
+        const data = {
+            function: `${contractAddress}::${functionName}` as `${string}::${string}::${string}`,
+            functionArguments: args,
+        };
+        if (isKeylessUser && keylessAccount) {
+            const response = await submitKeylessSponsoredTransaction({ keylessAccount, data });
+            return response.hash;
+        } else {
+            const response = await submitSponsoredTransaction({
+                accountAddress: account!.address.toString(),
+                data: {
+                    function: `${contractAddress}::${functionName}` as `${string}::${string}::${string}`,
+                    functionArguments: args as any,
+                },
+                signAndSubmitTransaction,
+                signTransaction,
+            });
+            return response.hash;
+        }
+    };
+
     const handleCreate = async () => {
-        if (!connected || !account) return;
+        if (!isAuthenticated || !activeAddress) return;
 
         setCreating(true);
         setError(null);
 
         try {
             // Check if user has a keycard
-            const hasKeycard = await keycardClient.hasKeycard(account.address.toString());
+            const hasKeycard = await keycardClient.hasKeycard(activeAddress);
             if (!hasKeycard) {
                 setError("You need a Keycard to create a room. Create one first.");
                 return;
             }
 
-            const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
             const now = Math.floor(Date.now() / 1000);
 
             // Parse reward to octas
@@ -46,17 +74,15 @@ export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
             // Check balance
             try {
                 const balance = await aptos.getAccountAPTAmount({
-                    accountAddress: account.address,
+                    accountAddress: activeAddress,
                 });
 
-                // Need reward + a bit for gas (e.g. 0.01 APT)
                 if (BigInt(balance) < rewardOctas + parseApt(0.01)) {
                     setError(`Insufficient balance. You need ${reward} APT + gas. Current: ${formatApt(balance)} APT`);
                     return;
                 }
             } catch (e) {
                 console.warn("Failed to check balance", e);
-                // Continue anyway, maybe simulation will catch it or it works
             }
 
             // Calculate deadlines from now
@@ -69,54 +95,16 @@ export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
             const taskHashBytes = encoder.encode(taskDescription || "Task Description");
             const taskHash = Array.from(taskHashBytes);
 
-            const payload = {
-                function: `${contractAddress}::room::create_room`,
-                functionArguments: [
-                    category,
-                    taskHash,
-                    rewardOctas.toString(),
-                    submitDeadline.toString(),
-                    commitDeadline.toString(),
-                    revealDeadline.toString(),
-                ],
-            };
+            const hash = await signAndSubmit("room::create_room", [
+                category,
+                taskHash,
+                rewardOctas.toString(),
+                submitDeadline.toString(),
+                commitDeadline.toString(),
+                revealDeadline.toString(),
+            ]);
 
-            // Simulate first to get exact error
-            try {
-                const transaction = await aptos.transaction.build.simple({
-                    sender: account.address,
-                    data: payload as any,
-                });
-
-                // Note: This simulation might fail if useWallet public key format doesn't match expected
-                // but it's worth a try for debugging.
-                // If account.publicKey is missing or weird, we skip simulation.
-                if (account.publicKey) {
-                    const [simResponse] = await aptos.transaction.simulate.simple({
-                        signerPublicKey: account.publicKey as any, // Cast to avoid type issues with string vs PublicKey
-                        transaction,
-                    });
-
-                    if (!simResponse.success) {
-                        console.error("Simulation failed:", simResponse);
-                        setError(`Simulation Failed: ${simResponse.vm_status}`);
-                        return;
-                    }
-                }
-            } catch (simErr) {
-                console.warn("Simulation check failed (skipping):", simErr);
-                // If our manual simulation fails (e.g. key format), we just proceed to try the wallet's submission
-            }
-
-            const response = await submitSponsoredTransaction({
-                accountAddress: account.address.toString(),
-                data: payload as any,
-                signAndSubmitTransaction,
-                signTransaction,
-            });
-
-            // Wait for transaction confirmation
-            await aptos.waitForTransaction({ transactionHash: response.hash });
+            await aptos.waitForTransaction({ transactionHash: hash });
 
             // Reset form and close
             setIsOpen(false);
@@ -125,7 +113,6 @@ export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
             onRoomCreated();
         } catch (err: any) {
             console.error("Error creating room:", err);
-            // Show detailed error for debugging
             const errorMessage = err?.message || err?.toString() || "Unknown error";
             setError(`Failed to create room: ${errorMessage}`);
         } finally {
@@ -137,7 +124,7 @@ export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                disabled={!connected}
+                disabled={!isAuthenticated}
                 className="btn btn-primary w-full"
             >
                 + Create Room
@@ -240,7 +227,7 @@ export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
                     </button>
                     <button
                         onClick={handleCreate}
-                        disabled={creating || !connected}
+                        disabled={creating || !isAuthenticated}
                         className="btn btn-primary flex-1"
                     >
                         {creating ? "Creating..." : "Create & Escrow"}

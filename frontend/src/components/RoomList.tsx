@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { aptos, getNextRoomId, ROOM_STATES, STATE_LABELS, STATE_BADGES } from "@/lib/aptosroom";
+import { enqueueRequest } from "@/lib/rateLimitedClient";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
@@ -20,33 +21,39 @@ interface RoomListProps {
 
 // Direct view calls using only actual #[view] functions from the contract
 async function viewGetState(roomId: number): Promise<number> {
-    const result = await aptos.view({
-        payload: {
-            function: `${CONTRACT_ADDRESS}::room::get_state`,
-            functionArguments: [roomId.toString()],
-        },
+    return enqueueRequest(async () => {
+        const result = await aptos.view({
+            payload: {
+                function: `${CONTRACT_ADDRESS}::room::get_state`,
+                functionArguments: [roomId.toString()],
+            },
+        });
+        return Number(result[0]);
     });
-    return Number(result[0]);
 }
 
 async function viewGetCategory(roomId: number): Promise<string> {
-    const result = await aptos.view({
-        payload: {
-            function: `${CONTRACT_ADDRESS}::room::get_category`,
-            functionArguments: [roomId.toString()],
-        },
+    return enqueueRequest(async () => {
+        const result = await aptos.view({
+            payload: {
+                function: `${CONTRACT_ADDRESS}::room::get_category`,
+                functionArguments: [roomId.toString()],
+            },
+        });
+        return result[0] as string;
     });
-    return result[0] as string;
 }
 
 async function viewGetSubmissionCount(roomId: number): Promise<number> {
-    const result = await aptos.view({
-        payload: {
-            function: `${CONTRACT_ADDRESS}::room::get_submission_count`,
-            functionArguments: [roomId.toString()],
-        },
+    return enqueueRequest(async () => {
+        const result = await aptos.view({
+            payload: {
+                function: `${CONTRACT_ADDRESS}::room::get_submission_count`,
+                functionArguments: [roomId.toString()],
+            },
+        });
+        return Number(result[0]);
     });
-    return Number(result[0]);
 }
 
 export function RoomList({ onSelectRoom, selectedRoomId, refreshTrigger }: RoomListProps) {
@@ -59,7 +66,7 @@ export function RoomList({ onSelectRoom, selectedRoomId, refreshTrigger }: RoomL
         setError(null);
 
         try {
-            const nextId = await getNextRoomId();
+            const nextId = await enqueueRequest(() => getNextRoomId());
             console.log("RoomList: nextId =", nextId);
 
             if (nextId <= 1) {
@@ -67,45 +74,23 @@ export function RoomList({ onSelectRoom, selectedRoomId, refreshTrigger }: RoomL
                 return;
             }
 
-            const startId = Math.max(1, nextId - 50);
-            const results: (RoomSummary | null)[] = [];
-            const BATCH_SIZE = 5;
+            const MAX_ROOMS = 5;
+            const startId = Math.max(1, nextId - MAX_ROOMS);
+            const results: RoomSummary[] = [];
 
-            // Define fetch function but don't call it yet
-            const fetchRoomData = async (i: number) => {
+            // Fetch rooms ONE AT A TIME through the rate-limited queue
+            for (let i = nextId - 1; i >= startId; i--) {
                 try {
-                    const [state, category, contributorCount] = await Promise.all([
-                        viewGetState(i),
-                        viewGetCategory(i),
-                        viewGetSubmissionCount(i),
-                    ]);
-                    // console.log(`Room ${i}: state=${state}, category=${category}, submissions=${contributorCount}`);
-                    return { id: i, state, category, contributorCount };
+                    const state = await viewGetState(i);
+                    const category = await viewGetCategory(i);
+                    const contributorCount = await viewGetSubmissionCount(i);
+                    results.push({ id: i, state, category, contributorCount });
                 } catch (e) {
                     console.warn(`Failed to fetch room ${i}:`, e);
-                    return null;
-                }
-            };
-
-            // Process in batches
-            for (let i = nextId - 1; i >= startId; i -= BATCH_SIZE) {
-                const batchPromises = [];
-                for (let j = i; j > i - BATCH_SIZE && j >= startId; j--) {
-                    batchPromises.push(fetchRoomData(j));
-                }
-
-                // Wait for batch to complete before starting next one
-                const batchResults = await Promise.all(batchPromises);
-                results.push(...batchResults);
-
-                // Small delay between batches to be nice to the API
-                if (i - BATCH_SIZE >= startId) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
                 }
             }
-            const validRooms = results.filter((r): r is RoomSummary => r !== null);
-            console.log("RoomList: Found", validRooms.length, "rooms");
-            setRooms(validRooms);
+            console.log("RoomList: Found", results.length, "rooms");
+            setRooms(results);
         } catch (err) {
             console.error("Error fetching rooms:", err);
             setError("Failed to load rooms");

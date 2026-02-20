@@ -14,6 +14,7 @@ module aptosroom::jury {
     use std::bcs;
     use aptos_framework::event;
     use aptos_framework::timestamp;
+    use aptos_framework::randomness;
     use aptosroom::errors;
     use aptosroom::constants;
     use aptosroom::room;
@@ -68,20 +69,33 @@ module aptosroom::jury {
     // ============================================================
 
     /// Select jurors for a room (INVARIANT_VOTE_002: unpredictable)
-    /// Uses deterministic shuffle with Aptos randomness seed
+    /// KEPT for ABI backward-compatibility. Delegates to select_jurors_with_seed.
+    /// In production, use start_jury_phase_random for true on-chain randomness.
     public fun select_jurors(
         room_id: u64,
         _category: &String,
         eligible_jurors: vector<address>,
         jury_size: u64,
     ): vector<address> {
+        // Legacy path: delegates to internal function
+        select_jurors_with_seed(room_id, eligible_jurors, jury_size, room_id)
+    }
+
+    /// Internal: Select jurors using an explicit random seed.
+    /// Called by start_jury_phase_random with a true on-chain random seed.
+    fun select_jurors_with_seed(
+        room_id: u64,
+        eligible_jurors: vector<address>,
+        jury_size: u64,
+        random_seed: u64,
+    ): vector<address> {
         // Assert sufficient jurors
         let len = vector::length(&eligible_jurors);
         assert!(len >= jury_size, errors::E_INSUFFICIENT_JURORS());
 
-        // Shuffle eligible jurors using seed derived from room_id and timestamp
+        // Shuffle eligible jurors using the random seed
         let mut_jurors = eligible_jurors;
-        shuffle_with_seed(&mut mut_jurors, room_id);
+        shuffle_with_seed(&mut mut_jurors, random_seed);
 
         // Take first jury_size elements
         let selected = vector::empty<address>();
@@ -101,7 +115,24 @@ module aptosroom::jury {
         selected
     }
 
-    /// Internal: Fisher-Yates shuffle with deterministic seed
+    #[randomness]
+    entry fun start_jury_phase_random(
+        account: &signer,
+        room_id: u64,
+        eligible_jurors: vector<address>,
+        jury_size: u64,
+    ) {
+        // Generate true on-chain random seed (unpredictable until tx executes)
+        let random_seed = randomness::u64_integer();
+
+        // Select jurors using the true random seed
+        let selected = select_jurors_with_seed(room_id, eligible_jurors, jury_size, random_seed);
+
+        // Assign jury pool to room and transition to JURY_ACTIVE
+        room::set_jury_pool(account, room_id, selected);
+    }
+
+    /// Internal: Fisher-Yates shuffle with a given seed
     fun shuffle_with_seed(list: &mut vector<address>, seed: u64) {
         let n = vector::length(list);
         if (n <= 1) {
@@ -121,7 +152,7 @@ module aptosroom::jury {
     /// Internal: Generate pseudo-random index from seed
     fun random_index(seed: u64, iteration: u64, max: u64): u64 {
         // Compute hash of seed concatenated with iteration
-        let combined = seed * 1000000 + iteration;
+        let combined = seed ^ (iteration * 6364136223846793005u64);
         let bytes = bcs::to_bytes(&combined);
         let hash_bytes = hash::sha3_256(bytes);
         

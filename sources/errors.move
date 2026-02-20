@@ -138,6 +138,9 @@ module aptosroom::errors {
     /// Duplicate contributor found in tier selections
     public fun E_DUPLICATE_IN_TIERS(): u64 { 613 }
 
+    /// Reveal phase not complete
+    public fun E_REVEAL_PHASE_NOT_COMPLETE(): u64 { 620 }
+
     /// Selected address is not a valid contributor
     public fun E_NOT_A_CONTRIBUTOR(): u64 { 614 }
 

@@ -14,6 +14,7 @@ import {
     hexToBytes,
 } from "@/lib/aptosroom";
 import { submitSponsoredTransaction } from "@/lib/sponsoredTransaction";
+import { enqueueRequest } from "@/lib/rateLimitedClient";
 
 interface TierVoteProps {
     roomId: number;
@@ -48,24 +49,24 @@ export function TierVote({ roomId, contributors, onVoteCommitted, isReveal = fal
 
             // 1. Check on-chain first (source of truth)
             try {
-                const [committed] = await aptos.view({
+                const [committed] = await enqueueRequest(() => aptos.view({
                     payload: {
                         function: `${CONTRACT}::jury::has_committed_tier` as `${string}::${string}::${string}`,
                         functionArguments: [roomId.toString(), addr],
                     },
-                });
+                }));
                 console.log("[TierVote] On-chain has_committed_tier:", committed);
 
                 if (committed) {
                     setHasCommitted(true);
 
                     // Check if already revealed
-                    const [revealed] = await aptos.view({
+                    const [revealed] = await enqueueRequest(() => aptos.view({
                         payload: {
                             function: `${CONTRACT}::jury::has_revealed_tier` as `${string}::${string}::${string}`,
                             functionArguments: [roomId.toString(), addr],
                         },
-                    });
+                    }));
                     console.log("[TierVote] On-chain has_revealed_tier:", revealed);
                     if (revealed) setHasRevealed(true);
                 }

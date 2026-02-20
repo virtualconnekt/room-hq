@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { WalletProvider } from "@/components/WalletProvider";
+import { KeylessAuthProvider } from "@/components/KeylessAuthContext";
 
 export const metadata: Metadata = {
   title: "AptosRoom Testnet",
@@ -16,7 +17,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <WalletProvider>
-          {children}
+          <KeylessAuthProvider>
+            {children}
+          </KeylessAuthProvider>
         </WalletProvider>
       </body>
     </html>

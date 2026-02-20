@@ -40,6 +40,12 @@ const config = new AptosConfig({
 
 export const aptos = new Aptos(config);
 
+// A second Aptos client WITHOUT the Gas Station plugin.
+// Use this to submit transactions that cannot have a fee payer
+// (e.g. #[randomness] entry functions like jury::start_jury_phase_random).
+const configNoSponsor = new AptosConfig({ network });
+export const aptosNoSponsor = new Aptos(configNoSponsor);
+
 // SDK Module Clients
 export const keycardClient = new KeycardClient(aptos, CONTRACT_ADDRESS);
 export const roomClient = new RoomClient(aptos, CONTRACT_ADDRESS);
@@ -61,14 +67,14 @@ export async function getNextRoomId(): Promise<number> {
 
         if (isNaN(nextId)) {
             console.warn("Parsed next_id is NaN", data);
-            return 50;
+            return 0;
         }
 
         console.log("Parsed next_id:", nextId);
         return nextId;
     } catch (e) {
-        console.warn("Failed to fetch RoomRegistry, defaulting to 50", e);
-        return 50;
+        console.warn("Failed to fetch RoomRegistry", e);
+        return 0; // Return 0 so RoomList shows "no rooms" instead of trying to fetch 50
     }
 }
 

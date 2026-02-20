@@ -104,6 +104,44 @@ export class JuryClient {
   }
 
   // ============================================================
+  // ENTRY FUNCTIONS - JURY SELECTION
+  // ============================================================
+
+  /**
+   * Select jurors using true on-chain randomness (aptos_framework::randomness).
+   * This atomically: generates a random seed, shuffles eligible jurors,
+   * assigns the jury pool, and transitions the room to JURY_ACTIVE.
+   *
+   * INVARIANT_VOTE_002: Unpredictable jury selection
+   */
+  async startJuryPhaseRandom(
+    account: Account,
+    roomId: number,
+    eligibleJurors: string[],
+    jurySize: number
+  ): Promise<PendingTransactionResponse> {
+    const payload: InputGenerateTransactionPayloadData = {
+      function: `${this.moduleAddress}::jury::start_jury_phase_random`,
+      functionArguments: [BigInt(roomId), eligibleJurors, BigInt(jurySize)],
+    };
+
+    const tx = await this.aptos.transaction.build.simple({
+      sender: account.accountAddress,
+      data: payload,
+    });
+
+    const signedTx = await this.aptos.transaction.sign({
+      signer: account,
+      transaction: tx,
+    });
+
+    return await this.aptos.transaction.submit.simple({
+      senderAuthenticator: signedTx,
+      transaction: tx,
+    });
+  }
+
+  // ============================================================
   // ENTRY FUNCTIONS - STANDARD VOTING
   // ============================================================
 
