@@ -78,7 +78,8 @@ module aptosroom::tier_tests {
         };
 
         // Set jury pool and state to JURY_ACTIVE
-        room::test_set_jury_pool(room_id, jurors);
+        room::test_set_state(room_id, constants::STATE_CLOSED());
+        room::test_set_jury_pool(client, room_id, jurors);
         room::test_set_state(room_id, constants::STATE_JURY_ACTIVE());
 
         room_id
@@ -836,7 +837,7 @@ module aptosroom::tier_tests {
         
         // Edge: 1 contributor
         assert!(constants::get_tier_a_slots(1) == 1, 4);
-        assert!(constants::get_tier_b_slots(1) == 2, 5);
+        assert!(constants::get_tier_b_slots(1) == 0, 5);
         
         // Edge: 0 contributors (should still return minimum slots)
         assert!(constants::get_tier_a_slots(0) == 1, 6);

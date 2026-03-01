@@ -6,8 +6,14 @@ import { aptos, parseApt, formatApt, keycardClient } from "@/lib/aptosroom";
 import { submitSponsoredTransaction, submitKeylessSponsoredTransaction } from "@/lib/sponsoredTransaction";
 import { useKeylessAuth } from "./KeylessAuthContext";
 
+interface NewRoomData {
+    category: string;
+    reward: string;
+    creator: string;
+}
+
 interface CreateRoomProps {
-    onRoomCreated: () => void;
+    onRoomCreated: (room: NewRoomData) => void;
 }
 
 export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
@@ -110,7 +116,7 @@ export function CreateRoom({ onRoomCreated }: CreateRoomProps) {
             setIsOpen(false);
             setTaskDescription("");
             setReward("1");
-            onRoomCreated();
+            onRoomCreated({ category, reward: rewardOctas.toString(), creator: activeAddress });
         } catch (err: any) {
             console.error("Error creating room:", err);
             const errorMessage = err?.message || err?.toString() || "Unknown error";

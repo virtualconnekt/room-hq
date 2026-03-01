@@ -152,9 +152,10 @@ module aptosroom::jury {
     /// Internal: Generate pseudo-random index from seed
     fun random_index(seed: u64, iteration: u64, max: u64): u64 {
         // Compute hash of seed concatenated with iteration
-        let combined = seed ^ (iteration * 6364136223846793005u64);
-        let bytes = bcs::to_bytes(&combined);
-        let hash_bytes = hash::sha3_256(bytes);
+        let data = vector::empty<u8>();
+        vector::append(&mut data, bcs::to_bytes(&seed));
+        vector::append(&mut data, bcs::to_bytes(&iteration));
+        let hash_bytes = hash::sha3_256(data);
         
         // Take first 8 bytes as u64
         let value: u64 = 0;

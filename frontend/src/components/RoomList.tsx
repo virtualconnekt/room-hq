@@ -17,6 +17,7 @@ interface RoomListProps {
     onSelectRoom: (roomId: number) => void;
     selectedRoomId: number | null;
     refreshTrigger?: number;
+    optimisticRooms?: RoomSummary[];
 }
 
 // Direct view calls using only actual #[view] functions from the contract
@@ -56,7 +57,7 @@ async function viewGetSubmissionCount(roomId: number): Promise<number> {
     });
 }
 
-export function RoomList({ onSelectRoom, selectedRoomId, refreshTrigger }: RoomListProps) {
+export function RoomList({ onSelectRoom, selectedRoomId, refreshTrigger, optimisticRooms = [] }: RoomListProps) {
     const [rooms, setRooms] = useState<RoomSummary[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -66,6 +67,32 @@ export function RoomList({ onSelectRoom, selectedRoomId, refreshTrigger }: RoomL
         setError(null);
 
         try {
+            // 1. Try fetching from Local Custom Indexer MVP
+            try {
+                const res = await fetch("/api/rooms");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.rooms) {
+                        console.log("RoomList: Fetched from Custom Indexer API:", data.rooms);
+                        const indexerRooms: RoomSummary[] = data.rooms.map((room: any) => ({
+                            id: Number(room.roomId),
+                            state: Number(room.state),
+                            category: room.category,
+                            contributorCount: 0 // Indexer doesn't track submissions yet
+                        }));
+
+                        if (indexerRooms.length > 0) {
+                            setRooms(indexerRooms);
+                            return; // Stop here if indexer succeeded and gave data
+                        }
+                    }
+                }
+            } catch (indexerErr) {
+                console.warn("Local API fetch failed, falling back to on-chain view calls:", indexerErr);
+            }
+
+            // 2. Fallback to slow on-chain view calls
+            console.log("RoomList: Falling back to on-chain view calls");
             const nextId = await enqueueRequest(() => getNextRoomId());
             console.log("RoomList: nextId =", nextId);
 
@@ -76,6 +103,7 @@ export function RoomList({ onSelectRoom, selectedRoomId, refreshTrigger }: RoomL
 
             const MAX_ROOMS = 5;
             const startId = Math.max(1, nextId - MAX_ROOMS);
+
             const results: RoomSummary[] = [];
 
             // Fetch rooms ONE AT A TIME through the rate-limited queue
@@ -103,6 +131,12 @@ export function RoomList({ onSelectRoom, selectedRoomId, refreshTrigger }: RoomL
         fetchRooms();
     }, [fetchRooms, refreshTrigger]);
 
+    // Auto-refresh every 10 seconds to sync with the indexer
+    useEffect(() => {
+        const interval = setInterval(fetchRooms, 10000);
+        return () => clearInterval(interval);
+    }, [fetchRooms]);
+
     if (loading && rooms.length === 0) {
         return (
             <div className="card">
@@ -128,10 +162,23 @@ export function RoomList({ onSelectRoom, selectedRoomId, refreshTrigger }: RoomL
                 <p className="text-red-400 text-sm mb-3">{error}</p>
             )}
 
-            {rooms.length === 0 ? (
+            {rooms.length === 0 && optimisticRooms.length === 0 ? (
                 <p className="text-gray-400 text-sm">No rooms found. Create one to get started!</p>
             ) : (
                 <div className="space-y-2 max-h-80 overflow-y-auto">
+                    {/* Optimistic entries shown instantly after room creation */}
+                    {optimisticRooms.map((room) => (
+                        <div
+                            key={room.id}
+                            className="w-full text-left p-3 rounded-lg border border-yellow-600/50 bg-yellow-900/10 opacity-70"
+                        >
+                            <div className="flex items-center justify-between">
+                                <span className="font-medium text-yellow-400">⏳ New Room</span>
+                                <span className="badge bg-yellow-800 text-yellow-300 text-xs">Pending…</span>
+                            </div>
+                            <div className="text-sm text-gray-400 mt-1">{room.category}</div>
+                        </div>
+                    ))}
                     {rooms.map((room) => (
                         <button
                             key={room.id}

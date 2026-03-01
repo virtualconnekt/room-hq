@@ -598,6 +598,9 @@ module aptosroom::room {
     }
 
     /// Transition to finalized (JURY_REVEAL -> FINALIZED)
+    /// NOTE: This function does NOT calculate scores. Caller must ensure:
+    ///   - For tier voting: aggregate_tier_votes() and process_tier_final_scores() called first
+    ///   - For legacy voting: calculate_jury_score() and process_final_scores() called first
     public entry fun finalize_room(account: &signer, room_id: u64) acquires RoomRegistry, Room {
         let caller = signer::address_of(account);
         let registry = borrow_global<RoomRegistry>(@aptosroom);
@@ -617,8 +620,11 @@ module aptosroom::room {
         let all_revealed = count_revealed_votes(room) == vector::length(&room.jury_pool);
         assert!(past_deadline || all_revealed, errors::E_REVEAL_PHASE_NOT_COMPLETE());
 
-        // Note: Variance detection and score calculation done by aggregation module
-        // before this transition
+        // Assert either legacy jury score or tier scores are computed
+        assert!(
+            room.jury_score_computed || room.tiers_computed,
+            errors::E_SCORES_NOT_COMPUTED()
+        );
 
         // Update state
         room.state = to_state;
@@ -1233,9 +1239,9 @@ module aptosroom::room {
     }
 
     #[test_only]
-    /// Test helper to set jury pool
-    public fun test_set_jury_pool(room_id: u64, jurors: vector<address>) acquires RoomRegistry, Room {
-        set_jury_pool(room_id, jurors);
+    /// Test helper to set jury pool (requires signer for authorization)
+    public fun test_set_jury_pool(account: &signer, room_id: u64, jurors: vector<address>) acquires RoomRegistry, Room {
+        set_jury_pool(account, room_id, jurors);
     }
 
     #[test_only]
@@ -1305,6 +1311,13 @@ module aptosroom::room {
         let room_owner = *table::borrow(&registry.rooms, room_id);
         let room = borrow_global_mut<Room>(room_owner);
         vector::push_back(&mut room.contributor_list, contributor);
+        let sub = Submission {
+            contributor,
+            data_hash: vector::empty<u8>(),
+            submitted_at: 0,
+            client_score: option::some(100),
+        };
+        table::add(&mut room.submissions, contributor, sub);
     }
 
     #[test_only]

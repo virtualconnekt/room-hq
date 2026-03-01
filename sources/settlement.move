@@ -89,6 +89,7 @@ module aptosroom::settlement {
 
     /// Execute settlement and release funds
     /// INVARIANT_DUAL_KEY_001: Both keys must be present
+    /// Supports both legacy (jury_score_computed) and tier-based (tiers_computed) scoring
     public entry fun execute_settlement(account: &signer, room_id: u64) {
         // Anyone can call, but both keys must be present
         let _ = signer::address_of(account);
@@ -98,7 +99,11 @@ module aptosroom::settlement {
         assert!(state == constants::STATE_FINALIZED(), errors::E_NOT_FINALIZED());
 
         // Assert jury score computed (Silver Key)
-        assert!(room::is_jury_score_computed(room_id), errors::E_JURY_NOT_FINALIZED());
+        // Works for both legacy (jury_score_computed) and tier-based (tiers_computed)
+        assert!(
+            room::is_jury_score_computed(room_id) || room::are_tiers_computed(room_id),
+            errors::E_JURY_NOT_FINALIZED()
+        );
 
         // Assert client approved (Gold Key)
         // INVARIANT_DUAL_KEY_001: Both keys verified

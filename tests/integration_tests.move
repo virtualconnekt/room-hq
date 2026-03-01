@@ -234,7 +234,8 @@ module aptosroom::integration_tests {
         room::create_room(client, string::utf8(b"design"), b"task", 1000000, now+3600, now+7200, now+10800);
         let room_id = 1;
 
-        room::test_set_jury_pool(room_id, vector[attacker_addr]);
+        room::test_set_state(room_id, constants::STATE_CLOSED());
+        room::test_set_jury_pool(client, room_id, vector[attacker_addr]);
         room::test_set_state(room_id, constants::STATE_JURY_ACTIVE());
 
         // Commit with score 75

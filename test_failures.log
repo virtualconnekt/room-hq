@@ -1,0 +1,1426 @@
+INCLUDING DEPENDENCY AptosFramework
+INCLUDING DEPENDENCY AptosStdlib
+INCLUDING DEPENDENCY MoveStdlib
+BUILDING aptosroom-protocol
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:16:39
+   [0m[34m│[0m
+[0m[34m16[0m [0m[34m│[0m     use aptos_framework::coin::{Self, [0m[33mCoin[0m};
+   [0m[34m│[0m                                       [0m[33m^^^^[0m [0m[33mUnused 'use' of alias 'Coin'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:25:14
+   [0m[34m│[0m
+[0m[34m25[0m [0m[34m│[0m     use std::[0m[33mhash[0m;
+   [0m[34m│[0m              [0m[33m^^^^[0m [0m[33mUnused 'use' of alias 'hash'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:673:5
+    [0m[34m│[0m
+[0m[34m673[0m [0m[34m│[0m     [0m[33m/// Submit work to room[0m
+    [0m[34m│[0m     [0m[33m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:674:5
+    [0m[34m│[0m
+[0m[34m674[0m [0m[34m│[0m     [0m[33m/// INVARIANT_SUBMISSION_001: One per contributor[0m
+    [0m[34m│[0m     [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:690:5
+    [0m[34m│[0m
+[0m[34m690[0m [0m[34m│[0m     [0m[33m/// Close room for submissions (OPEN -> CLOSED)[0m
+    [0m[34m│[0m     [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:698:5
+    [0m[34m│[0m
+[0m[34m698[0m [0m[34m│[0m     [0m[33m/// Transition to jury active (CLOSED -> JURY_ACTIVE)[0m
+    [0m[34m│[0m     [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:706:5
+    [0m[34m│[0m
+[0m[34m706[0m [0m[34m│[0m     [0m[33m/// Transition to reveal phase (JURY_ACTIVE -> JURY_REVEAL)[0m
+    [0m[34m│[0m     [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:714:5
+    [0m[34m│[0m
+[0m[34m714[0m [0m[34m│[0m     [0m[33m/// Transition to finalized (JURY_REVEAL -> FINALIZED)[0m
+    [0m[34m│[0m     [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:724:5
+    [0m[34m│[0m
+[0m[34m724[0m [0m[34m│[0m     [0m[33m/// Set client score for a submission[0m
+    [0m[34m│[0m     [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/settlement.move:12:14
+   [0m[34m│[0m
+[0m[34m12[0m [0m[34m│[0m     use std::[0m[33moption[0m::{Self, Option};
+   [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnused 'use' of alias 'option'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/vault.move:9:14
+  [0m[34m│[0m
+[0m[34m9[0m [0m[34m│[0m     use std::[0m[33msigner[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnused 'use' of alias 'signer'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:1:1
+  [0m[34m│[0m
+[0m[34m1[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:2:1
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m [0m[33m/// TEST MODULE: Integration Tests[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:3:1
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m [0m[33m/// SPEC: TEST_PLAN.md Section 6[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:4:1
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m [0m[33m/// PURPOSE: Full end-to-end flow tests[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:5:1
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:10:14
+   [0m[34m│[0m
+[0m[34m10[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+   [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnused 'use' of alias 'vector'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:16:20
+   [0m[34m│[0m
+[0m[34m16[0m [0m[34m│[0m     use aptosroom::[0m[33mjuror_registry[0m;
+   [0m[34m│[0m                    [0m[33m^^^^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'juror_registry'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:20:20
+   [0m[34m│[0m
+[0m[34m20[0m [0m[34m│[0m     use aptosroom::[0m[33mvariance[0m;
+   [0m[34m│[0m                    [0m[33m^^^^^^^^[0m [0m[33mUnused 'use' of alias 'variance'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:21:20
+   [0m[34m│[0m
+[0m[34m21[0m [0m[34m│[0m     use aptosroom::[0m[33maggregation[0m;
+   [0m[34m│[0m                    [0m[33m^^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'aggregation'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:22:20
+   [0m[34m│[0m
+[0m[34m22[0m [0m[34m│[0m     use aptosroom::[0m[33msettlement[0m;
+   [0m[34m│[0m                    [0m[33m^^^^^^^^^^[0m [0m[33mUnused 'use' of alias 'settlement'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:1:1
+  [0m[34m│[0m
+[0m[34m1[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:2:1
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m [0m[33m/// TEST MODULE: Jury Tests[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:3:1
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m [0m[33m/// SPEC: TEST_PLAN.md Section 5.3[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:4:1
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m [0m[33m/// PURPOSE: Unit tests for jury selection, commit, and reveal[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:5:1
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/keycard_tests.move:1:1
+  [0m[34m│[0m
+[0m[34m1[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/keycard_tests.move:2:1
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m [0m[33m/// TEST MODULE: Keycard Tests[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/keycard_tests.move:3:1
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m [0m[33m/// SPEC: TEST_PLAN.md Section 5.1[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/keycard_tests.move:4:1
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m [0m[33m/// PURPOSE: Unit tests for Keycard and JurorRegistry modules[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/keycard_tests.move:5:1
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:1:1
+  [0m[34m│[0m
+[0m[34m1[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:2:1
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m [0m[33m/// TEST MODULE: Room Tests[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:3:1
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m [0m[33m/// SPEC: TEST_PLAN.md Section 5.2[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:4:1
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m [0m[33m/// PURPOSE: Unit tests for Vault, Room, and Submission modules[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:5:1
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:1:1
+  [0m[34m│[0m
+[0m[34m1[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:2:1
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m [0m[33m/// TEST MODULE: Settlement Tests[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:3:1
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m [0m[33m/// SPEC: TEST_PLAN.md Section 5.5[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:4:1
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m [0m[33m/// PURPOSE: Unit tests for Dual-Key settlement[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:5:1
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:1:1
+  [0m[34m│[0m
+[0m[34m1[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:2:1
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m [0m[33m/// TEST MODULE: Tier System Tests[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:3:1
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m [0m[33m/// SPEC: TESTNET_TEST_PLAN.md Phase 8[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:4:1
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m [0m[33m/// PURPOSE: Integration tests for slot-limited tier voting system[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:5:1
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:1:1
+  [0m[34m│[0m
+[0m[34m1[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:2:1
+  [0m[34m│[0m
+[0m[34m2[0m [0m[34m│[0m [0m[33m/// TEST MODULE: Variance Tests[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:3:1
+  [0m[34m│[0m
+[0m[34m3[0m [0m[34m│[0m [0m[33m/// SPEC: TEST_PLAN.md Section 5.4[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:4:1
+  [0m[34m│[0m
+[0m[34m4[0m [0m[34m│[0m [0m[33m/// PURPOSE: Unit tests for variance detection algorithm[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: invalid documentation comment[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:5:1
+  [0m[34m│[0m
+[0m[34m5[0m [0m[34m│[0m [0m[33m/// ============================================================[0m
+  [0m[34m│[0m [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[33mDocumentation comment cannot be matched to a language item[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:8:14
+  [0m[34m│[0m
+[0m[34m8[0m [0m[34m│[0m     use std::[0m[33mvector[0m;
+  [0m[34m│[0m              [0m[33m^^^^^^[0m [0m[33mUnused 'use' of alias 'vector'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: unused alias[0m
+  [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:9:26
+  [0m[34m│[0m
+[0m[34m9[0m [0m[34m│[0m     use aptos_framework::[0m[33maccount[0m;
+  [0m[34m│[0m                          [0m[33m^^^^^^^[0m [0m[33mUnused 'use' of alias 'account'. Consider removing it[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: This assignment/binding to the left-hand-side variable `juror_count` is unused. Consider removing this assignment/binding, or prefixing the left-hand-side variable with an underscore (e.g., `_juror_count`), or renaming to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/aggregation.move:229:27
+    [0m[34m│[0m
+[0m[34m229[0m [0m[34m│[0m         let juror_count = [0m[33mvector::length(&revealed_jurors)[0m;
+    [0m[34m│[0m                           [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: This assignment/binding to the left-hand-side variable `scores` is unused. Consider removing this assignment/binding, or prefixing the left-hand-side variable with an underscore (e.g., `_scores`), or renaming to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/variance.move:142:22
+    [0m[34m│[0m
+[0m[34m142[0m [0m[34m│[0m         let scores = [0m[33mvector::empty<u64>()[0m;
+    [0m[34m│[0m                      [0m[33m^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: This assignment/binding to the left-hand-side variable `valid_count` is unused. Consider removing this assignment/binding, or prefixing the left-hand-side variable with an underscore (e.g., `_valid_count`), or renaming to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/variance.move:396:27
+    [0m[34m│[0m
+[0m[34m396[0m [0m[34m│[0m         let valid_count = [0m[33mvector::length(&revealed_scores)[0m;
+    [0m[34m│[0m                           [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:74:37
+   [0m[34m│[0m
+[0m[34m74[0m [0m[34m│[0m     fun test_integration_happy_path([0m[33mframework[0m: &signer) {
+   [0m[34m│[0m                                     [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:96:44
+   [0m[34m│[0m
+[0m[34m96[0m [0m[34m│[0m     fun test_integration_variance_flagging([0m[33mframework[0m: &signer) {
+   [0m[34m│[0m                                            [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:115:36
+    [0m[34m│[0m
+[0m[34m115[0m [0m[34m│[0m     fun test_integration_tie_score([0m[33mframework[0m: &signer) {
+    [0m[34m│[0m                                    [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:135:45
+    [0m[34m│[0m
+[0m[34m135[0m [0m[34m│[0m     fun test_integration_single_contributor([0m[33mframework[0m: &signer) {
+    [0m[34m│[0m                                             [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:151:41
+    [0m[34m│[0m
+[0m[34m151[0m [0m[34m│[0m     fun test_integration_minimum_jurors([0m[33mframework[0m: &signer) {
+    [0m[34m│[0m                                         [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:169:43
+    [0m[34m│[0m
+[0m[34m169[0m [0m[34m│[0m     fun test_integration_zero_valid_votes([0m[33mframework[0m: &signer) {
+    [0m[34m│[0m                                           [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:185:37
+    [0m[34m│[0m
+[0m[34m185[0m [0m[34m│[0m     fun test_integration_multi_room([0m[33mframework[0m: &signer) {
+    [0m[34m│[0m                                     [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:201:43
+    [0m[34m│[0m
+[0m[34m201[0m [0m[34m│[0m     fun test_integration_juror_multi_room([0m[33mframework[0m: &signer) {
+    [0m[34m│[0m                                           [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `juror`. Consider removing the parameter, or prefixing with an underscore (e.g., `_juror`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:223:45
+    [0m[34m│[0m
+[0m[34m223[0m [0m[34m│[0m     fun test_commit_after_deadline_rejected([0m[33mjuror[0m: &signer, framework: &signer) {
+    [0m[34m│[0m                                             [0m[33m^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:223:61
+    [0m[34m│[0m
+[0m[34m223[0m [0m[34m│[0m     fun test_commit_after_deadline_rejected(juror: &signer, [0m[33mframework[0m: &signer) {
+    [0m[34m│[0m                                                             [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `client`. Consider removing the parameter, or prefixing with an underscore (e.g., `_client`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:375:38
+    [0m[34m│[0m
+[0m[34m375[0m [0m[34m│[0m     fun test_zero_valid_votes_refund([0m[33mclient[0m: &signer, framework: &signer, aptosroom: &signer) {
+    [0m[34m│[0m                                      [0m[33m^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: This assignment/binding to the left-hand-side variable `client_addr` is unused. Consider removing this assignment/binding, or prefixing the left-hand-side variable with an underscore (e.g., `_client_addr`), or renaming to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:763:27
+    [0m[34m│[0m
+[0m[34m763[0m [0m[34m│[0m         let client_addr = [0m[33msigner::address_of(client)[0m;
+    [0m[34m│[0m                           [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: This assignment/binding to the left-hand-side variable `scores` is unused. Consider removing this assignment/binding, or prefixing the left-hand-side variable with an underscore (e.g., `_scores`), or renaming to `_`[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:22:22
+   [0m[34m│[0m
+[0m[34m22[0m [0m[34m│[0m         let scores = [0m[33mvector[0m[80, 82, 87, 15];
+   [0m[34m│[0m                      [0m[33m^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:137:47
+    [0m[34m│[0m
+[0m[34m137[0m [0m[34m│[0m     fun test_variance_flag_increments_keycard([0m[33mframework[0m: &signer) {
+    [0m[34m│[0m                                               [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Unused value of parameter `framework`. Consider removing the parameter, or prefixing with an underscore (e.g., `_framework`), or binding to `_`[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/variance_tests.move:144:46
+    [0m[34m│[0m
+[0m[34m144[0m [0m[34m│[0m     fun test_valid_vote_no_keycard_increment([0m[33mframework[0m: &signer) {
+    [0m[34m│[0m                                              [0m[33m^^^^^^^^^[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:210:24
+    [0m[34m│[0m
+[0m[34m210[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 605[0m)] // E_HASH_MISMATCH
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:261:24
+    [0m[34m│[0m
+[0m[34m261[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 300[0m)] // E_VAULT_LOCKED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:287:24
+    [0m[34m│[0m
+[0m[34m287[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 100[0m)] // E_ALREADY_HAS_KEYCARD
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:304:24
+    [0m[34m│[0m
+[0m[34m304[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 500[0m)] // E_DUPLICATE_SUBMISSION
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:101:24
+    [0m[34m│[0m
+[0m[34m101[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 202[0m)] // E_INSUFFICIENT_JURORS
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:167:24
+    [0m[34m│[0m
+[0m[34m167[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 203[0m)] // E_NOT_JUROR
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:181:24
+    [0m[34m│[0m
+[0m[34m181[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 602[0m)] // E_ALREADY_COMMITTED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:201:24
+    [0m[34m│[0m
+[0m[34m201[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 600[0m)] // E_NOT_IN_COMMIT_PHASE
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:220:24
+    [0m[34m│[0m
+[0m[34m220[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 607[0m)] // E_COMMIT_DEADLINE_PASSED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:258:24
+    [0m[34m│[0m
+[0m[34m258[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 605[0m)] // E_HASH_MISMATCH
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:280:24
+    [0m[34m│[0m
+[0m[34m280[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 605[0m)] // E_HASH_MISMATCH
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:302:24
+    [0m[34m│[0m
+[0m[34m302[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 606[0m)] // E_INVALID_SCORE
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:324:24
+    [0m[34m│[0m
+[0m[34m324[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 603[0m)] // E_ALREADY_REVEALED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:347:24
+    [0m[34m│[0m
+[0m[34m347[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 604[0m)] // E_NOT_COMMITTED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:365:24
+    [0m[34m│[0m
+[0m[34m365[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 601[0m)] // E_NOT_IN_REVEAL_PHASE
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/keycard_tests.move:82:24
+   [0m[34m│[0m
+[0m[34m82[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 100[0m)] // E_ALREADY_HAS_KEYCARD
+   [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+   [0m[34m│[0m                                     [0m[34m│[0m
+   [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/keycard_tests.move:138:24
+    [0m[34m│[0m
+[0m[34m138[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 101[0m)] // E_NO_KEYCARD
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/keycard_tests.move:151:24
+    [0m[34m│[0m
+[0m[34m151[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 200[0m)] // E_ALREADY_REGISTERED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/keycard_tests.move:323:24
+    [0m[34m│[0m
+[0m[34m323[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 103[0m)] // E_KEYCARD_NOT_FOUND
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:94:24
+   [0m[34m│[0m
+[0m[34m94[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 103[0m)] // E_KEYCARD_NOT_FOUND
+   [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+   [0m[34m│[0m                                     [0m[34m│[0m
+   [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:169:24
+    [0m[34m│[0m
+[0m[34m169[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 400[0m)] // E_INVALID_STATE_TRANSITION
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:212:24
+    [0m[34m│[0m
+[0m[34m212[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 400[0m)] // E_INVALID_STATE_TRANSITION (checked before terminal)
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:254:24
+    [0m[34m│[0m
+[0m[34m254[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 300[0m)] // E_VAULT_LOCKED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:320:24
+    [0m[34m│[0m
+[0m[34m320[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 500[0m)] // E_DUPLICATE_SUBMISSION
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:346:24
+    [0m[34m│[0m
+[0m[34m346[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 401[0m)] // E_ROOM_NOT_OPEN
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:369:24
+    [0m[34m│[0m
+[0m[34m369[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 501[0m)] // E_DEADLINE_PASSED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:395:24
+    [0m[34m│[0m
+[0m[34m395[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 103[0m)] // E_KEYCARD_NOT_FOUND
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:447:24
+    [0m[34m│[0m
+[0m[34m447[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 404[0m)] // E_NOT_CLIENT
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/room_tests.move:475:24
+    [0m[34m│[0m
+[0m[34m475[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 606[0m)] // E_INVALID_SCORE
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+   [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:99:24
+   [0m[34m│[0m
+[0m[34m99[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 404[0m)] // E_NOT_CLIENT
+   [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+   [0m[34m│[0m                                     [0m[34m│[0m
+   [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:114:24
+    [0m[34m│[0m
+[0m[34m114[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 703[0m)] // E_APPROVAL_ALREADY_GIVEN
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:132:24
+    [0m[34m│[0m
+[0m[34m132[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 700[0m)] // E_NOT_FINALIZED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:175:24
+    [0m[34m│[0m
+[0m[34m175[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 702[0m)] // E_CLIENT_NOT_APPROVED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/settlement_tests.move:192:24
+    [0m[34m│[0m
+[0m[34m192[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 701[0m)] // E_JURY_NOT_FINALIZED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:176:24
+    [0m[34m│[0m
+[0m[34m176[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 602[0m)] // E_ALREADY_COMMITTED
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:249:24
+    [0m[34m│[0m
+[0m[34m249[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 611[0m)] // E_INVALID_TIER_A_COUNT
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:279:24
+    [0m[34m│[0m
+[0m[34m279[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 612[0m)] // E_INVALID_TIER_B_COUNT
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:309:24
+    [0m[34m│[0m
+[0m[34m309[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 613[0m)] // E_DUPLICATE_IN_TIERS
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:339:24
+    [0m[34m│[0m
+[0m[34m339[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 614[0m)] // E_NOT_A_CONTRIBUTOR
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+[0m[1m[38;5;11mwarning[0m[1m: Test will pass on an abort from *any* module.[0m
+    [0m[34m┌─[0m /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:369:24
+    [0m[34m│[0m
+[0m[34m369[0m [0m[34m│[0m     #[expected_failure([0m[33mabort_code = 605[0m)] // E_HASH_MISMATCH
+    [0m[34m│[0m                        [0m[33m^^^^^^^^^^^^^^^^[0m
+    [0m[34m│[0m                                     [0m[34m│[0m
+    [0m[34m│[0m                                     [0m[34mReplace value with constant from expected module or add `location=...` attribute.[0m
+
+Running Move unit tests
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_commit_after_deadline_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::constants::test_state_values_unique
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::constants::test_tier_scores
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::constants::test_tier_slots_high
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::constants::test_tier_slots_low
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::constants::test_tier_slots_mid
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::constants::test_tier_to_score
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::aggregation::test_final_score_calculation
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::aggregation::test_final_score_equal_weights
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::aggregation::test_median_empty
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::constants::test_variance_threshold_is_15
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::constants::test_weights_sum_to_100
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::aggregation::test_median_even_count
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::aggregation::test_median_odd_count
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::aggregation::test_median_single
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement::test_dual_key_concept
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement::test_single_key_insufficient
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_consensus_cluster_preserved
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance::test_abs_diff_positive
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_identical_scores
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance::test_consensus_not_flagged
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance::test_outlier_detection
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_max_distance
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_multiple_outliers
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance::test_threshold_boundary
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_outlier_detected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_single_vote_not_flagged
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_threshold_boundary_flagged
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_threshold_boundary_not_flagged
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_two_scores_close
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_two_scores_far
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_valid_vote_no_keycard_increment
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::variance_tests::test_variance_flag_increments_keycard
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_juror_count_tracking
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_juror_duplicate_registration_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_juror_multiple_categories
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_juror_registration_success
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_juror_registration_without_keycard_rejected
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_commit_double_commit_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_approve_double_approval_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_juror_unregistration_success
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_client_score_above_max_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_attack_client_early_withdraw
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_keycard_avg_score_calculation
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_commit_tier_vote_double_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_approve_non_client_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_keycard_duplicate_mint_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_client_set_score_success
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_keycard_id_increments
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_commit_non_juror_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_approve_settlement_success
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_keycard_jury_participation_increment
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_commit_reveal_round_trip
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_non_client_set_score_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_keycard_mint_success
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_attack_juror_changes_score
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_attack_juror_extreme_score_flagged
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_keycard_stats_initialized_zero
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_commit_tier_vote_success
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_approve_wrong_state_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_attack_sybil_multiple_keycards
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_keycard_task_completion_updates_stats
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_determine_majority_tier
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_room_creation_insufficient_escrow_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_find_majority_tier
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_keycard_variance_flag_increment
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::keycard_tests::test_stats_update_without_keycard_fails
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_commit_vote_success
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_room_creation_success
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_funds_released_exactly_once
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_multi_juror_tier_voting
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_attack_sybil_multiple_submissions
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_room_creation_without_keycard_rejected
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_commit_wrong_state_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_integration_happy_path
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_integration_juror_multi_room
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_integration_minimum_jurors
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_hash_computation_deterministic
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_integration_multi_room
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_integration_single_contributor
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_integration_tie_score
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_integration_variance_flagging
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests::test_integration_zero_valid_votes
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_hash_different_inputs
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_reveal_tier_vote_duplicate_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_loser_keycards_updated
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_jury_selection_correct_count
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_room_full_state_machine
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_jury_selection_excludes_ineligible
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_reveal_tier_vote_hash_mismatch
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_settlement_both_keys_required
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_room_invalid_transition_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_jury_selection_insufficient_candidates
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_reveal_tier_vote_non_contributor_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_room_state_init_to_open
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_jury_selection_randomness
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_room_state_open_to_closed
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_reveal_tier_vote_success
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_settlement_without_approval_rejected
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_reveal_double_reveal_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_room_transition_from_settled_rejected
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_reveal_tier_vote_wrong_a_count
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_submission_after_deadline_rejected
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_reveal_tier_vote_wrong_b_count
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_abs_diff
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_settlement_without_jury_score_rejected
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_reveal_hash_mismatch_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_submission_duplicate_rejected
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_aggregation_split_vote
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_single_contributor_wins
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_reveal_score_out_of_range_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_submission_success
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_aggregation_unanimous
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_final_score_calculation
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_state_settled_is_final
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_reveal_vote_success
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_tie_first_submission_wins
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_submission_without_keycard_rejected
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_final_score_processing
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_slot_edge_cases
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_slots_high_contributors
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_slots_low_contributors
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_slots_mid_contributors
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests::test_tier_to_score_conversion
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_submission_wrong_state_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_vault_unlocked_after_settle
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_reveal_without_commit_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_winner_is_highest_score
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_vault_locked_on_creation
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_reveal_wrong_salt_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_winner_keycard_updated
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_vault_unlocked_after_settle
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_winner_receives_full_payout
+[ FAIL    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests::test_reveal_wrong_state_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room_tests::test_vault_withdraw_before_settle_rejected
+[ PASS    ] 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::settlement_tests::test_zero_valid_votes_refund
+
+Test failures:
+
+Failures in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::integration_tests:
+
+┌── test_attack_juror_changes_score ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 605, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	integration_tests::test_attack_juror_changes_score(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/integration_tests.move:237)
+│ 
+└──────────────────
+
+Failures in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury_tests:
+
+┌── test_commit_double_commit_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 602, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_commit_double_commit_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:189)
+│ 
+└──────────────────
+
+
+┌── test_commit_non_juror_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 203, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_commit_non_juror_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:173)
+│ 
+└──────────────────
+
+
+┌── test_commit_vote_success ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test was not expected to error, but it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_commit_vote_success(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:154)
+│ 
+└──────────────────
+
+
+┌── test_commit_wrong_state_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 600, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_commit_wrong_state_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:209)
+│ 
+└──────────────────
+
+
+┌── test_jury_selection_correct_count ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:155:31
+│     │
+│ 153 │     fun random_index(seed: u64, iteration: u64, max: u64): u64 {
+│     │         ------------ In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury
+│ 154 │         // Compute hash of seed concatenated with iteration
+│ 155 │         let combined = seed ^ (iteration * 6364136223846793005u64);
+│     │                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Test was not expected to error, but it gave an arithmetic error with error message: "Multiplication overflow". Error originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury rooted here
+│ 
+│ 
+│ stack trace
+│ 	jury::shuffle_with_seed(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:145)
+│ 	jury::select_jurors_with_seed(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:98)
+│ 	jury::select_jurors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:81)
+│ 	jury_tests::test_jury_selection_correct_count(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:95)
+│ 
+└──────────────────
+
+
+┌── test_jury_selection_excludes_ineligible ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:155:31
+│     │
+│ 153 │     fun random_index(seed: u64, iteration: u64, max: u64): u64 {
+│     │         ------------ In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury
+│ 154 │         // Compute hash of seed concatenated with iteration
+│ 155 │         let combined = seed ^ (iteration * 6364136223846793005u64);
+│     │                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Test was not expected to error, but it gave an arithmetic error with error message: "Multiplication overflow". Error originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury rooted here
+│ 
+│ 
+│ stack trace
+│ 	jury::shuffle_with_seed(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:145)
+│ 	jury::select_jurors_with_seed(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:98)
+│ 	jury::select_jurors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:81)
+│ 	jury_tests::test_jury_selection_excludes_ineligible(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:118)
+│ 
+└──────────────────
+
+
+┌── test_jury_selection_randomness ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:155:31
+│     │
+│ 153 │     fun random_index(seed: u64, iteration: u64, max: u64): u64 {
+│     │         ------------ In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury
+│ 154 │         // Compute hash of seed concatenated with iteration
+│ 155 │         let combined = seed ^ (iteration * 6364136223846793005u64);
+│     │                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Test was not expected to error, but it gave an arithmetic error with error message: "Multiplication overflow". Error originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::jury rooted here
+│ 
+│ 
+│ stack trace
+│ 	jury::shuffle_with_seed(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:145)
+│ 	jury::select_jurors_with_seed(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:98)
+│ 	jury::select_jurors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/jury.move:81)
+│ 	jury_tests::test_jury_selection_randomness(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:133)
+│ 
+└──────────────────
+
+
+┌── test_reveal_double_reveal_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 603, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_reveal_double_reveal_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:332)
+│ 
+└──────────────────
+
+
+┌── test_reveal_hash_mismatch_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 605, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_reveal_hash_mismatch_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:266)
+│ 
+└──────────────────
+
+
+┌── test_reveal_score_out_of_range_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 606, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_reveal_score_out_of_range_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:310)
+│ 
+└──────────────────
+
+
+┌── test_reveal_vote_success ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test was not expected to error, but it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_reveal_vote_success(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:241)
+│ 
+└──────────────────
+
+
+┌── test_reveal_without_commit_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 604, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_reveal_without_commit_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:355)
+│ 
+└──────────────────
+
+
+┌── test_reveal_wrong_salt_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 605, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_reveal_wrong_salt_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:288)
+│ 
+└──────────────────
+
+
+┌── test_reveal_wrong_state_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 601, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	jury_tests::setup_room_with_juror(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:68)
+│ 	jury_tests::test_reveal_wrong_state_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/jury_tests.move:373)
+│ 
+└──────────────────
+
+Failures in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests:
+
+┌── test_commit_tier_vote_double_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 602, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_commit_tier_vote_double_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:191)
+│ 
+└──────────────────
+
+
+┌── test_commit_tier_vote_success ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test was not expected to error, but it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_commit_tier_vote_success(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:161)
+│ 
+└──────────────────
+
+
+┌── test_multi_juror_tier_voting ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test was not expected to error, but it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_multi_juror_tier_voting(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:559)
+│ 
+└──────────────────
+
+
+┌── test_reveal_tier_vote_duplicate_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 613, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_reveal_tier_vote_duplicate_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:324)
+│ 
+└──────────────────
+
+
+┌── test_reveal_tier_vote_hash_mismatch ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 605, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_reveal_tier_vote_hash_mismatch(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:384)
+│ 
+└──────────────────
+
+
+┌── test_reveal_tier_vote_non_contributor_rejected ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 614, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_reveal_tier_vote_non_contributor_rejected(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:354)
+│ 
+└──────────────────
+
+
+┌── test_reveal_tier_vote_success ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test was not expected to error, but it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_reveal_tier_vote_success(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:223)
+│ 
+└──────────────────
+
+
+┌── test_reveal_tier_vote_wrong_a_count ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 611, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_reveal_tier_vote_wrong_a_count(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:264)
+│ 
+└──────────────────
+
+
+┌── test_reveal_tier_vote_wrong_b_count ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test did not abort with expected code. Expected test to abort with code 612, but instead it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_reveal_tier_vote_wrong_b_count(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:294)
+│ 
+└──────────────────
+
+
+┌── test_tier_aggregation_split_vote ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test was not expected to error, but it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_tier_aggregation_split_vote(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:697)
+│ 
+└──────────────────
+
+
+┌── test_tier_aggregation_unanimous ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test was not expected to error, but it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_tier_aggregation_unanimous(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:624)
+│ 
+└──────────────────
+
+
+┌── test_tier_final_score_processing ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:535:9
+│     │
+│ 521 │     public(friend) fun set_jury_pool(
+│     │                        ------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room
+│     ·
+│ 535 │         assert!(room.state == constants::STATE_CLOSED(), errors::E_INVALID_STATE_TRANSITION());
+│     │         ^^^^^^ Test was not expected to error, but it aborted with code 400 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::room rooted here
+│ 
+│ 
+│ stack trace
+│ 	room::test_set_jury_pool(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/sources/room.move:1244)
+│ 	tier_tests::setup_room_with_contributors(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:81)
+│ 	tier_tests::test_tier_final_score_processing(/home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:774)
+│ 
+└──────────────────
+
+
+┌── test_tier_slot_edge_cases ──────
+│ error[E11001]: test failure
+│     ┌─ /home/abdoulaahmad/Documents/aptos/aptosroom-protocol/tests/tier_tests.move:839:9
+│     │
+│ 828 │     fun test_tier_slot_edge_cases() {
+│     │         ------------------------- In this function in 0x2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests
+│     ·
+│ 839 │         assert!(constants::get_tier_b_slots(1) == 2, 5);
+│     │         ^^^^^^ Test was not expected to error, but it aborted with code 5 originating in the module 2bf0af3ddc84bf1d6d32e0961a678cca4cd49f4f3a79b5b9d3b892bbfa6cc455::tier_tests rooted here
+│ 
+│ 
+└──────────────────
+
+Test result: FAILED. Total tests: 136; passed: 108; failed: 28
+{
+  "Error": "Move unit tests failed"
+}

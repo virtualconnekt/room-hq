@@ -65,7 +65,8 @@ module aptosroom::jury_tests {
 
         // Set jury pool and state to JURY_ACTIVE
         let jury_pool = vector::singleton(juror_addr);
-        room::test_set_jury_pool(room_id, jury_pool);
+        room::test_set_state(room_id, constants::STATE_CLOSED());
+        room::test_set_jury_pool(client, room_id, jury_pool);
         room::test_set_state(room_id, constants::STATE_JURY_ACTIVE());
 
         room_id

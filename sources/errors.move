@@ -159,6 +159,9 @@ module aptosroom::errors {
     /// Not all contributors scored — cannot start jury phase
     public fun E_SCORES_INCOMPLETE(): u64 { 619 }
 
+    /// Scores not computed before finalize (neither legacy nor tier)
+    public fun E_SCORES_NOT_COMPUTED(): u64 { 621 }
+
     // ============================================================
     // SETTLEMENT ERRORS (700-799)
     // ============================================================

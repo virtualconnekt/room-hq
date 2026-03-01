@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  roomId          BigInt   @id
+  creatorAddress  String
+  category        String
+  taskReward      BigInt
+  createdAt       BigInt
+  state           Int      @default(1) // 1 = STATE_OPEN
+}
+
+model Keycard {
+  ownerAddress    String   @id
+  keycardId       BigInt
+  createdAt       BigInt
+}
+
+model ProcessorState {
+  processorName   String   @id
+  lastEventSeq    BigInt   @default(0)
+}

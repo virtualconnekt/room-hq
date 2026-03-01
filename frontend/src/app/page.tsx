@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import type { RoomSummary } from "@/components/RoomList";
 import {
   WalletConnect,
   KeycardPanel,
@@ -13,8 +14,23 @@ export default function Dashboard() {
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const handleRoomCreated = useCallback(() => {
-    setRefreshTrigger((prev) => prev + 1);
+  const [optimisticRooms, setOptimisticRooms] = useState<RoomSummary[]>([]);
+
+  const handleRoomCreated = useCallback((room: { category: string; reward: string; creator: string }) => {
+    // 1. Immediately inject the new room optimistically (no id yet, use -1 as placeholder)
+    const optimistic: RoomSummary = {
+      id: -Date.now(), // temp unique negative id
+      state: 1,
+      category: room.category,
+      contributorCount: 0,
+    };
+    setOptimisticRooms((prev) => [optimistic, ...prev]);
+
+    // 2. After 6s (one indexer poll cycle), trigger a real fetch which will replace optimistic data
+    setTimeout(() => {
+      setOptimisticRooms([]);
+      setRefreshTrigger((prev) => prev + 1);
+    }, 6000);
   }, []);
 
   const handleRoomAction = useCallback(() => {
@@ -50,6 +66,7 @@ export default function Dashboard() {
               onSelectRoom={setSelectedRoomId}
               selectedRoomId={selectedRoomId}
               refreshTrigger={refreshTrigger}
+              optimisticRooms={optimisticRooms}
             />
 
             <CreateRoom onRoomCreated={handleRoomCreated} />
