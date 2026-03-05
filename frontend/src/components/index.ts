@@ -6,3 +6,4 @@ export { RoomDetail } from "./RoomDetail";
 export { CreateRoom } from "./CreateRoom";
 export { TierVote } from "./TierVote";
 export { SettleRoom } from "./SettleRoom";
+export { SmartDashboard } from "./SmartDashboard";

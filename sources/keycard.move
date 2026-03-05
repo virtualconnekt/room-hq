@@ -9,9 +9,11 @@ module aptosroom::keycard {
     use std::signer;
     use std::string::String;
     use std::vector;
+    use std::option::{Self, Option};
     use aptos_framework::event;
     use aptos_framework::timestamp;
     use aptosroom::errors;
+    use aptosroom::constants;
 
     // ============================================================
     // STRUCTS
@@ -30,8 +32,15 @@ module aptosroom::keycard {
         avg_score: u64,
         /// Number of jury participations
         jury_participations: u64,
-        /// Number of times flagged for variance
+        /// Total lifetime variance flags
         variance_flags: u64,
+        /// Consecutive variance flags (resets on successful task completion)
+        /// INVARIANT_KEYCARD_001: 2 consecutive flags → is_suspended = true
+        consecutive_flags: u8,
+        /// Room ID of last variance flag (for consecutive detection)
+        last_flagged_room_id: Option<u64>,
+        /// Whether this keycard holder is currently suspended
+        is_suspended: bool,
         /// Categories this keycard holder is eligible for
         categories: vector<String>,
         /// Timestamp of keycard creation
@@ -63,6 +72,19 @@ module aptosroom::keycard {
         avg_score: u64,
         jury_participations: u64,
         variance_flags: u64,
+    }
+
+    #[event]
+    struct KeycardSuspended has drop, store {
+        owner: address,
+        consecutive_flags: u8,
+        timestamp: u64,
+    }
+
+    #[event]
+    struct KeycardUnsuspended has drop, store {
+        owner: address,
+        timestamp: u64,
     }
 
     // ============================================================
@@ -104,6 +126,9 @@ module aptosroom::keycard {
             avg_score: 0,
             jury_participations: 0,
             variance_flags: 0,
+            consecutive_flags: 0,
+            last_flagged_room_id: option::none<u64>(),
+            is_suspended: false,
             categories: vector::empty<String>(),
             created_at: timestamp::now_seconds(),
         };
@@ -164,6 +189,21 @@ module aptosroom::keycard {
         borrow_global<Keycard>(addr).variance_flags
     }
 
+    #[view]
+    /// Get consecutive variance flags count
+    public fun get_consecutive_flags(addr: address): u8 acquires Keycard {
+        assert!(exists<Keycard>(addr), errors::E_KEYCARD_NOT_FOUND());
+        borrow_global<Keycard>(addr).consecutive_flags
+    }
+
+    #[view]
+    /// Check if this keycard holder is suspended
+    /// INVARIANT_KEYCARD_001: Suspended jurors cannot be selected for jury
+    public fun is_suspended(addr: address): bool acquires Keycard {
+        if (!exists<Keycard>(addr)) { return false };
+        borrow_global<Keycard>(addr).is_suspended
+    }
+
     // ============================================================
     // INTERNAL FUNCTIONS (called by other modules via friend)
     // ============================================================
@@ -176,6 +216,7 @@ module aptosroom::keycard {
     /// Add a completed task to keycard stats
     /// Called by settlement module after room settles
     /// Uses weighted average formula: new_avg = ((old_avg * old_count) + new_score) / new_count
+    /// Also resets consecutive flags if score >= MIN_TASK_SCORE_FOR_UNSUSPEND (unsuspend path)
     public(friend) fun add_task_completion(
         addr: address,
         score: u64,
@@ -193,8 +234,26 @@ module aptosroom::keycard {
         // new_avg = ((old_avg * old_count) + new_score) / new_count
         let new_count = keycard.tasks_completed;
         keycard.avg_score = ((old_avg * old_count) + score) / new_count;
+
+        // UNSUSPEND PATH: If task score >= threshold, reset consecutive flags
+        // This is the only way to recover from suspension.
+        // Spec: score >= 75 resets consecutive_flags and lifts suspension.
+        let was_suspended = keycard.is_suspended;
+        if (score >= constants::MIN_TASK_SCORE_FOR_UNSUSPEND()) {
+            keycard.consecutive_flags = 0;
+            keycard.last_flagged_room_id = option::none<u64>();
+            keycard.is_suspended = false;
+        };
         
-        // Emit event
+        // Emit unsuspend event if they were suspended and are now unsuspended
+        if (was_suspended && !keycard.is_suspended) {
+            event::emit(KeycardUnsuspended {
+                owner: addr,
+                timestamp: timestamp::now_seconds(),
+            });
+        };
+
+        // Emit stats update event
         event::emit(KeycardStatsUpdated {
             owner: addr,
             tasks_completed: keycard.tasks_completed,
@@ -222,15 +281,46 @@ module aptosroom::keycard {
         });
     }
 
-    /// Increment variance flags count
+    /// Increment variance flags count with consecutive tracking
     /// Called by variance module when juror vote is flagged as outlier
-    public(friend) fun increment_variance_flags(addr: address) acquires Keycard {
+    /// INVARIANT_KEYCARD_001: 2 consecutive flags (from different rooms) → auto-suspend
+    public(friend) fun increment_variance_flags(addr: address, room_id: u64) acquires Keycard {
         assert!(exists<Keycard>(addr), errors::E_KEYCARD_NOT_FOUND());
         
         let keycard = borrow_global_mut<Keycard>(addr);
+
+        // Increment total lifetime flags
         keycard.variance_flags = keycard.variance_flags + 1;
-        
-        // Emit event
+
+        // Determine if this flag is consecutive with the previous one.
+        // Consecutive = flagged in a DIFFERENT room from the last flag
+        // (same room twice doesn't count as consecutive — only across rooms).
+        let is_new_consecutive = if (option::is_some(&keycard.last_flagged_room_id)) {
+            let prev_room = *option::borrow(&keycard.last_flagged_room_id);
+            prev_room != room_id // flagged in a different room = consecutive
+        } else {
+            true // first flag ever = start of consecutive chain
+        };
+
+        if (is_new_consecutive) {
+            keycard.consecutive_flags = keycard.consecutive_flags + 1;
+        };
+        // Always update to this room as last flagged
+        keycard.last_flagged_room_id = option::some(room_id);
+
+        // INVARIANT_KEYCARD_001: 2+ consecutive flags → suspend
+        let consecutive = keycard.consecutive_flags;
+        let threshold = (constants::CONSECUTIVE_FLAGS_THRESHOLD() as u8);
+        if (consecutive >= threshold && !keycard.is_suspended) {
+            keycard.is_suspended = true;
+            event::emit(KeycardSuspended {
+                owner: addr,
+                consecutive_flags: consecutive,
+                timestamp: timestamp::now_seconds(),
+            });
+        };
+
+        // Emit stats update event
         event::emit(KeycardStatsUpdated {
             owner: addr,
             tasks_completed: keycard.tasks_completed,

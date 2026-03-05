@@ -55,6 +55,21 @@ module aptosroom::constants {
     public fun JURY_SIZE_MIN(): u64 { 3 }
 
     // ============================================================
+    // KEYCARD ELIGIBILITY THRESHOLDS
+    // ============================================================
+
+    /// Number of consecutive variance flags before a juror is suspended
+    /// CTO-LOCKED: 2 consecutive flags from different rooms = suspended
+    public fun CONSECUTIVE_FLAGS_THRESHOLD(): u64 { 2 }
+
+    /// Minimum task score required to lift suspension (unsuspend path)
+    /// CTO-LOCKED: Score >= 75 on a completed task resets consecutive flags
+    public fun MIN_TASK_SCORE_FOR_UNSUSPEND(): u64 { 75 }
+
+    /// Minimum completed tasks required to be eligible as juror
+    public fun MIN_COMPLETED_TASKS_FOR_JURY(): u64 { 3 }
+
+    // ============================================================
     // DUAL-KEY CONSENSUS WEIGHTS
     // ============================================================
     

@@ -164,8 +164,8 @@ module aptosroom::variance {
             let juror = *vector::borrow(&flagged, j);
             // Mark vote as variance_flagged in room
             room::flag_vote_for_variance(room_id, juror);
-            // Increment keycard variance_flags
-            keycard::increment_variance_flags(juror);
+            // Increment keycard variance_flags (pass room_id for consecutive tracking)
+            keycard::increment_variance_flags(juror, room_id);
             j = j + 1;
         };
 
@@ -327,7 +327,8 @@ module aptosroom::variance {
             let f = 0;
             while (f < flagged_len) {
                 let juror = *vector::borrow(&flagged, f);
-                keycard::increment_variance_flags(juror);
+                // Pass room_id for consecutive flag tracking
+                keycard::increment_variance_flags(juror, room_id);
                 total_flags = total_flags + 1;
                 f = f + 1;
             };

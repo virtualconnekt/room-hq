@@ -13,6 +13,15 @@ const config: Config = {
                 foreground: 'var(--foreground)',
                 accent: 'var(--accent)',
             },
+            keyframes: {
+                fadeInUp: {
+                    '0%': { opacity: '0', transform: 'translateY(2rem)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+            },
+            animation: {
+                'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            },
         },
     },
     plugins: [],
